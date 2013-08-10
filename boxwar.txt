@@ -1,0 +1,33 @@
+"boxwar"
+{
+	"base"		"base"
+	"title"		"BoxWar"
+	"maps"		"^bw_"
+	"menusystem"	"1"
+	"workshopid"	""
+
+	"settings"
+	{
+		1
+		{
+			"name"		"bw_maxfrags"
+			"text"		"Max Frags"
+			"help"		"The maxiumum number of frags before a map change"
+			"type"		"numeric"
+			"default"	"20"
+		}
+
+
+		
+		2
+		{
+			"name"		"bw_grenades"
+			"text"		"Allow Grenades"
+			"help"		"If enabled ) then grenades are enabled"
+			"type"		"checkbox"
+			"default"	"1"
+		}
+
+	}
+
+}
