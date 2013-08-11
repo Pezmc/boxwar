@@ -1,3 +1,4 @@
+DEFINE_BASECLASS( "player_default" )
 
 local CLASS = {}
 
@@ -21,4 +22,4 @@ function CLASS:Loadout( pl )
 	
 end
 
-player_class.Register( "Box", CLASS )
+player_manager.RegisterClass( "Box", CLASS, "player_default" )
