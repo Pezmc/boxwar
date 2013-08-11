@@ -11,15 +11,31 @@ CLASS.DrawTeamRing			= false
 
 function CLASS:Loadout( pl )
 
-	pl:GiveAmmo( 20, "Buckshot" )
-	pl:GiveAmmo( 400, "SMG1" )
-	pl:GiveAmmo( 50, "pistol" )
+	self.Player:GiveAmmo( 20, "Buckshot" )
+	self.Player:GiveAmmo( 400, "SMG1" )
+	self.Player:GiveAmmo( 50, "pistol" )
 	
-	pl:Give( "weapon_pistol" )
-	pl:Give( "weapon_shotgun" )
-	pl:Give( "weapon_smg1" )
-	pl:Give( "item_ar2_grenade" )
+	self.Player:Give( "weapon_pistol" )
+	self.Player:Give( "weapon_shotgun" )
+	self.Player:Give( "weapon_smg1" )
+	self.Player:Give( "item_ar2_grenade" )
 	
+end
+
+-- Called on spawn
+function CLASS:OnSpawn(pl)
+
+	-- Make sure player model doesn't show up to anyone else.
+	pl:SetColor(255, 255, 255, 0)
+
+	// Create a new ph_prop entity, set its collision type, and spawn it.
+	pl.prop = ents.Create("box_prop")
+	pl.prop:SetSolid(SOLID_BSP)
+	pl.prop:SetOwner(pl)
+	pl.prop:Spawn()
+
+	// Set initial max health.
+	pl.prop.max_health = 100
 end
 
 player_manager.RegisterClass( "player_box", CLASS, "player_default" )
