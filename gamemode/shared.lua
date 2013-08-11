@@ -1,7 +1,5 @@
 -- Run on client and server
 
-DeriveGamemode( "fretta" )
-
 IncludePlayerClasses()	
 
 GM.Name = "BoxWar"
