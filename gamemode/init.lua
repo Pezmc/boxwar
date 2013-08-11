@@ -1,12 +1,13 @@
---- This file is only run on the server
-
-AddCSLuaFile("cl_init.lua")
+--- Code for the client
 AddCSLuaFile("shared.lua")
+AddCSLuaFile("player_class/class_box.lua")
+AddCSLuaFile("cl_init.lua")
 
+--- This file is only run on the server
 include("shared.lua")
-include("player.lua")
+--include("player.lua")--]
 
-function GM:PlayerConnect( name, ip )
+--[[function GM:PlayerConnect( name, ip )
 	print("Player" .. name .. " has joined the game.")
 end
 
@@ -14,12 +15,12 @@ function GM:PlayerInitialSpawn( player )
 	ply:PrintMessage(HUD_PRINTCENTER,"Welcome to the server!")
 	print("Player: " .. ply:Nick() .. " has spawned.")
 end
-
+]]
 function GM:PlayerSetModel( player )
-	ply:SetModel("models/player/group01/male_07.mdl")
+	player:SetModel("models/props_junk/wood_crate001a.mdl")
 end
 
-function GM:PlayerAuthed( ply, steamID, uniqueID )
+--[[function GM:PlayerAuthed( ply, steamID, uniqueID )
 	print("Player: " .. ply:Nick() .. " has auth.")
 end
 
@@ -38,6 +39,4 @@ function GM:FragLimitThink()
 		end
 		
 	end
-end
-
-timer.Create( "FragLimitThink", 1, 0, function() GAMEMODE:FragLimitThink() end )
+end]]

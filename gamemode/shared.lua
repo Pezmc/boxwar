@@ -1,9 +1,13 @@
 -- Run on client and server
 
+include("player_class/class_box.lua")
+
 GM.Name = "BoxWar"
 GM.Author = "Need4Beans"
 GM.Email = "email@pezcuckow.com"
 GM.Website = "www.need4beans.com"
+-- Date of last change
+GM.Version = "2013-08-11"
 
 GM.GameLength 			= 30	
 GM.MaximumDeathLength	= 1
@@ -15,7 +19,6 @@ GM.ShowTeamName 		= false
 GM.NoPlayerTeamDamage 	= false
 GM.FragLimit			= 20
 
-include("player_class/class_box.lua")
 
 function GM:CreateTeams()
 
@@ -25,11 +28,11 @@ function GM:CreateTeams()
 
 end
 
--- Called when the game starts
+--[[ Called when the game starts
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
 
 -- We are not using sandbox so this doesn't exist
 function DoPropSpawnedEffect( e )
-end
+end]]
