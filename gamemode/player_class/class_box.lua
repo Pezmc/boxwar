@@ -22,4 +22,4 @@ function CLASS:Loadout( pl )
 	
 end
 
-player_manager.Register( "Box", CLASS )
+player_manager.RegisterClass( "player_box", CLASS, "player_default" )
