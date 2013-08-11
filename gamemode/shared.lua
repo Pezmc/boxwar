@@ -1,7 +1,5 @@
 -- Run on client and server
 
-IncludePlayerClasses()	
-
 GM.Name = "BoxWar"
 GM.Author = "Need4Beans"
 GM.Email = "email@pezcuckow.com"
@@ -16,6 +14,8 @@ GM.SelectColor			= true
 GM.ShowTeamName 		= false
 GM.NoPlayerTeamDamage 	= false
 GM.FragLimit			= 20
+
+include("player_class/class_box.lua")
 
 function GM:CreateTeams()
 
