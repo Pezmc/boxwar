@@ -9,12 +9,14 @@ include("shared.lua")
 function ENT:Initialize()
 
 	self:SetModel("models/props_junk/wood_crate001a.mdl")
+	self:PhysicsInit( SOLID_VPHYSICS )      -- Make us work with physics,
+	--self:SetMoveType( MOVETYPE_VPHYSICS )   -- after all, gmod is a physics
+	self:SetSolid( SOLID_VPHYSICS )         -- Toolbox
 	self.health = 100
 
 end 
 
-
--- Called when the takes damage.
+-- Called when box takes damage.
 function ENT:OnTakeDamage(dmg)
 
 	-- Damage info
@@ -34,6 +36,15 @@ function ENT:OnTakeDamage(dmg)
 
 			-- Kill the player and remove their prop.
 			pl:KillSilent()
+			
+			self:PrecacheGibs()
+			
+			--@todo, spawn a ragdol here?
+			-- Smash the prop
+			self:GibBreakClient(self:GetPos())
+			--self:GibBreakServer(self:GetPos())
+		    
+		    -- Delete the prop
 			pl:RemoveProp()
 
 			-- Find out what player should take credit for the kill.
@@ -48,15 +59,19 @@ function ENT:OnTakeDamage(dmg)
 				end
 
 			end
-
-			print(attacker:Name() .. " found and killed " .. pl:Name() .. "\n") 
+			
+			-- Print to chat & to the murderer
+			PrintMessage( HUD_PRINTTALK, attacker:Name() .. " found and killed " .. pl:Name() .. ".")
+			if(attacker:IsPlayer()) then attacker:PrintMessage( HUD_PRINTCENTER, " You killed " .. pl:Name() .. "." ) end
 
 			-- Add points to the attacker's score and up their health.
 			attacker:AddFrags(1)
-			attacker:SetHealth(math.Clamp(attacker:Health() + 10, 1, 100))
+			attacker:SetHealth(math.Clamp(attacker:Health() + 25, 1, 100)) -- 10 bonus health
 
 		end
 
 	end
+	
+	
 
 end 

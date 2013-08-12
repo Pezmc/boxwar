@@ -14,9 +14,11 @@ function meta:RemoveProp()
 	if CLIENT || !self:IsValid() || !self.prop || !self.prop:IsValid() then
 		return
 	end
+	
+	-- Despawn player
+	self.spawned = false
 
 	-- Remove the player's prop
 	self.prop:Remove()
 	self.prop = nil
-
 end

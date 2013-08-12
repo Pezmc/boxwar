@@ -1,15 +1,17 @@
 DEFINE_BASECLASS( "player_default" )
 
-local CLASS = {}
+local PLAYER = {}
 
-CLASS.DisplayName			= "Box"
-CLASS.WalkSpeed 			= 230
-CLASS.CrouchedWalkSpeed 	= 0.2
-CLASS.RunSpeed				= 400
-CLASS.DuckSpeed				= 0.2
-CLASS.DrawTeamRing			= false
+PLAYER.DisplayName			= "Box"
+PLAYER.WalkSpeed 			= 230
+PLAYER.CrouchedWalkSpeed 	= 0.2
+PLAYER.RunSpeed				= 400
+PLAYER.DuckSpeed			= 0.2
+PLAYER.DrawTeamRing			= false
 
-function CLASS:Loadout( pl )
+function PLAYER:Loadout()
+
+	self.Player:RemoveAllAmmo()
 
 	self.Player:GiveAmmo( 20, "Buckshot" )
 	self.Player:GiveAmmo( 400, "SMG1" )
@@ -18,24 +20,19 @@ function CLASS:Loadout( pl )
 	self.Player:Give( "weapon_pistol" )
 	self.Player:Give( "weapon_shotgun" )
 	self.Player:Give( "weapon_smg1" )
-	self.Player:Give( "item_ar2_grenade" )
+	--self.Player:Give( "item_ar2_grenade" )
 	
 end
 
--- Called on spawn
-function CLASS:OnSpawn(pl)
-
-	-- Make sure player model doesn't show up to anyone else.
-	pl:SetColor(255, 255, 255, 0)
-
-	// Create a new ph_prop entity, set its collision type, and spawn it.
-	pl.prop = ents.Create("box_prop")
-	pl.prop:SetSolid(SOLID_BSP)
-	pl.prop:SetOwner(pl)
-	pl.prop:Spawn()
-
-	// Set initial max health.
-	pl.prop.max_health = 100
+function PLAYER:Spawn()
+	BaseClass.Spawn( self ) -- This is a must have
 end
 
-player_manager.RegisterClass( "player_box", CLASS, "player_default" )
+-- Called on spawn
+function PLAYER:OnSpawn()
+	-- Make sure player model doesn't show up to anyone else.
+	
+	BaseClass.OnSpawn( self ) -- This is a must have
+end
+
+player_manager.RegisterClass( "player_crate", PLAYER, "player_default" )
