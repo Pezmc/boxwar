@@ -184,6 +184,14 @@ function SpawnBoxMaze()
 	DOUBLE_DOWN = "↓"
 	DOUBLE_LEFT = "←"
 	DOUBLE_EMPTY = 5
+		
+	-- Hollow the center of the maze, would be cool if this could be a circle
+	for x=math.floor(xWidth*0.40),math.ceil(xWidth*0.6) do
+		for y=math.floor(yWidth*0.40),math.ceil(yWidth*0.6) do
+			grid[x][y] = math.random(1,10) < 9 and 0 or 1; --% of times to be hollow
+		end
+	end
+	math.floor(xWidth*0.4)
 	
 	-- Search for doubles
 	for x=0,xWidth do

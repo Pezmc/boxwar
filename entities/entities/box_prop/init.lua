@@ -75,3 +75,63 @@ function ENT:OnTakeDamage(dmg)
 	
 
 end 
+
+local lastYaw = 0
+
+function ENT:Think()
+
+	--[[self.R = self.R or 0; -- if R is nil, make it 0
+ 
+	if(self.R < 255) then
+			self:SetColor(Color(self.R, 0, 0, 255)); -- actually set the color
+			self.R = self.R + 1; -- increment R
+	end]]
+
+	local pl = self:GetOwner()
+	
+	if pl:IsValid() then
+	
+		-- Make box red when player "angry"
+		local playerAngry = false
+		if(pl.angerLevel > 50) then
+			playerAngry = true
+			local color = math.floor(((pl.angerLevel-50) + 1) / 4);
+			if(color > 128) then color = 128; end --don't let the player get too red
+			
+			pl.prop:SetColor(Color(255,255-color,255-color,255));
+		else
+			-- Make sure they reset to the true color
+			if(playerAngry) then
+				pl.prop:SetColor(Color(255,255,255,255));
+				playerAngry = false
+			end
+		end
+		
+		-- Decrease the player anger level
+		if(pl.angerLevel > 0) then
+			pl.angerLevel = pl.angerLevel - 10
+		end
+	
+		--[[
+	
+		local m = Matrix()
+				
+		-- If the player is holding down attack 2 don't rotate
+		if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
+			m:SetAngles(Angle(0, lastYaw, 0)) --only the yaw (rotation in z)
+		else
+			local angles = pl:GetAngles()
+			m:SetAngles(Angle(0, angles.y, 0)) --only the yaw (rotation in z)
+			lastYaw = angles.y
+		end]]
+		
+		--print("Info:")
+		--print(pl:GetPos())
+		--print(self:GetPos())
+		--self:SetLocalPos(Vector(0, , ))
+		--self:SetPos(pl:GetPos() + Vector(0, 0, -self:OBBMins().z))
+		--print(self:GetPos())
+		--self:SetAngles(m:GetAngles())
+		--self:SetAngles(Angle(0,0,0))
+	end
+end

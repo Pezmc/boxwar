@@ -16,7 +16,7 @@ function ENT:Draw()
 	
 	if pl:IsValid() then
 		-- don't draw the hat on the local player if they are in firstperson mode
-		if LocalPlayer() == pl and not LocalPlayer():ShouldDrawLocalPlayer() then
+		if LocalPlayer() == pl and not LocalPlayer():KeyDown(IN_ATTACK2) and not LocalPlayer():ShouldDrawLocalPlayer() then
 			return
 		end
 	
@@ -33,7 +33,7 @@ function ENT:Draw()
 		
 		-- Set to player pos and add 20 in z
 		m:SetTranslation(pl:GetPos())
-		m:Translate(Vector(0, 0, 20))
+		m:Translate(Vector(0, 0, -self:OBBMins().z))
 		
 		self:SetRenderOrigin(m:GetTranslation())
 		self:SetRenderAngles(m:GetAngles())

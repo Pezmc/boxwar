@@ -92,6 +92,15 @@ function GM:PlayerSelectSpawn( pl )
     return spawns[spawnNumber]
 end
 
+	
+--[[function GM:KeyPress( pl, key )	
+	 if ( key == IN_ATTACK ) then
+	 	Player:KeyDownLast( number key )
+		pl.angerLevel = pl.angerLevel + 1
+		print(pl.angerLevel)
+	 end
+end]]
+
 -- Set a player to be a box
 function SetBox ( pl ) 
 
@@ -121,10 +130,12 @@ function SetBox ( pl )
 		pl.prop:SetSolid(SOLID_BBOX)
 		pl.prop:SetParent(pl)
 		pl.prop:Spawn()
+		pl.angerLevel = 0;
 	
 		-- Set initial player max health.
 		pl.prop.max_health = 100
 		pl.prop.health = 100
+		
 	
 		--[[ Calculate hull based on prop size.
 		local hull_xy_max 	= math.Round(math.Max(pl.prop:OBBMaxs().x, pl.prop:OBBMaxs().y))
@@ -207,9 +218,15 @@ function GM:InitPostEntity()
 end
 
 -- Called every server tick.
---[[function Think()
+function Think()
+	for _, pl in pairs(player.GetAll()) do
+		if ( pl:KeyDown(IN_ATTACK) ) then
+			pl.angerLevel = pl.angerLevel + 1
+		end
+	end
 
-	-- Calculate the location of every Prop's prop entity.
+
+	--[[ Calculate the location of every Prop's prop entity.
 	for _, pl in pairs(player.GetAll()) do
 
 		-- Check for a valid player/prop, and if they aren't freezing their prop.
@@ -220,7 +237,7 @@ end
 
 		end
 
-	end
+	end]]
 
 end
-hook.Add("Think", "BoxWar_Think", Think)]]
+hook.Add("Think", "BoxWar_Think", Think)
