@@ -335,7 +335,11 @@ function SpawnProp(position, model, angle)
 	local ang = Vector(0,0,1):Angle();
 	ang.pitch = ang.pitch + 90;
 	if(angle == nil) then
-		ang:RotateAroundAxis(ang:Up(), math.random(0,4) * 90)
+		if(math.random(1,10) <= 4) then -- % chance
+			ang:RotateAroundAxis(ang:Up(), math.random(0,4) * 90)
+		else
+			ang:RotateAroundAxis(ang:Up(), math.random(0,4) * 90 + math.random(-5, 5))
+		end
 	else
 		ang:RotateAroundAxis(ang:Up(), angle)
 	end

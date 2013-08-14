@@ -113,8 +113,13 @@ function SetBox ( pl )
 		
 		-- Then spawn a new box around them
 		pl.prop = ents.Create("box_prop")
-		pl.prop:SetNotSolid(true)
+		--pl.prop:SetNotSolid(true)
 		pl.prop:SetOwner(pl)
+		
+		pl.prop:SetPos(pl:GetPos())
+		pl.prop:SetAngles(pl:GetAngles())
+		pl.prop:SetSolid(SOLID_BBOX)
+		pl.prop:SetParent(pl)
 		pl.prop:Spawn()
 	
 		-- Set initial player max health.
@@ -147,7 +152,7 @@ function EntityTakeDamage( target, dmginfo )
 	local attacker 	= dmginfo:GetAttacker()
 	local inflictor = dmginfo:GetInflictor()
 
-	if target && !target:IsPlayer() && attacker && attacker:IsPlayer() && attacker:Alive() then
+	if target && !target:IsPlayer() && target:GetClass() != "box_prop" && attacker && attacker:IsPlayer() && attacker:Alive() then
 		
 		--[[
 				-- If prop is now dead, take damage
@@ -202,7 +207,7 @@ function GM:InitPostEntity()
 end
 
 -- Called every server tick.
-function Think()
+--[[function Think()
 
 	-- Calculate the location of every Prop's prop entity.
 	for _, pl in pairs(player.GetAll()) do
@@ -218,4 +223,4 @@ function Think()
 	end
 
 end
-hook.Add("Think", "BoxWar_Think", Think)
+hook.Add("Think", "BoxWar_Think", Think)]]

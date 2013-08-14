@@ -68,38 +68,37 @@ function GM:PlayerSpawn()
     end
 end
 
-function GM:PlayerSpawn() 
-	if ( weapon.UseHands || !weapon:IsScripted() ) then
-    	local hands = LocalPlayer():GetHands()
-    	if ( IsValid( hands ) ) then hands:DrawModel() end
-    end	
+function GM:PostDrawViewModel( vm, ply, weapon )
+   if weapon.UseHands or (not weapon:IsScripted()) then
+      local hands = LocalPlayer():GetHands()
+      if IsValid(hands) then hands:DrawModel() end
+   end
 end
 
 -- Decides where the player view should be.
---[[function GM:CalcView(pl, origin, angles, fov)
-
-	-- Create empty array to store view information in.
+function GM:CalcView(pl, origin, angles, fov)
 	local view = {} 
 
-	--[[ If the player is supposed blind, set their view off the map.
-	if blind then
-
-		view.origin = Vector(20000, 0, 0)
-		view.angles = Angle(0, 0, 0)
-		view.fov 	= fov
-
-		return view
-
-	end
-
-	-- Set view variables to given function arguements.
  	view.origin = origin 
  	view.angles	= angles 
- 	view.fov 	= fov 
+ 	view.fov = fov 
  	
- 	-- Change the view
-	view.origin = origin + Vector(0, 0, hull_z - 20) --+ (angles:Forward() * -80)
- 	
- 	return view
+ 	-- Give the active weapon a go at changing the viewmodel position 
+	if (pl:KeyDown(IN_ATTACK2)) then
+		view.origin = origin + Vector(0, 0, 80 - 60) + (angles:Forward() * -80)
+	else
+	 	local wep = pl:GetActiveWeapon() 
+	 	if wep && wep != NULL then 
+	 		local func = wep.GetViewModelPosition 
+	 		if func then 
+	 			view.vm_origin, view.vm_angles = func(wep, origin*1, angles*1)
+	 		end
 
-end]]
+	 		local func = wep.CalcView 
+	 		if func then 
+	 			view.origin, view.angles, view.fov = func(wep, pl, origin*1, angles*1, fov)	 		end 
+	 	end
+	end
+ 	
+ 	return view 
+end
