@@ -20,6 +20,10 @@ function ResetHull(um)
 end
 usermessage.Hook("ResetHull", ResetHull)
 
+-- Disable crouching on client side
+hook.Add("PlayerBindPress", "AntiCrouch", function(ply, bind)
+      if (string.find(bind, "+duck")) then return true end
+end )
 
 -- Sets the player hull and the health status.
 function SetHull(um)
@@ -71,7 +75,9 @@ end
 function GM:PostDrawViewModel( vm, ply, weapon )
    if weapon.UseHands or (not weapon:IsScripted()) then
       local hands = LocalPlayer():GetHands()
-      if IsValid(hands) then hands:DrawModel() end
+      if IsValid(hands) and not ply:KeyDown(IN_ATTACK2) then
+      	hands:DrawModel()
+      end
    end
 end
 
@@ -85,8 +91,10 @@ function GM:CalcView(pl, origin, angles, fov)
  	
  	-- Give the active weapon a go at changing the viewmodel position 
 	if (pl:KeyDown(IN_ATTACK2)) then
+		pl:DrawViewModel(false)
 		view.origin = origin + Vector(0, 0, 80 - 60) + (angles:Forward() * -80)
 	else
+		pl:DrawViewModel(true)
 	 	local wep = pl:GetActiveWeapon() 
 	 	if wep && wep != NULL then 
 	 		local func = wep.GetViewModelPosition 
@@ -96,7 +104,12 @@ function GM:CalcView(pl, origin, angles, fov)
 
 	 		local func = wep.CalcView 
 	 		if func then 
-	 			view.origin, view.angles, view.fov = func(wep, pl, origin*1, angles*1, fov)	 		end 
+	 			view.origin, view.angles, view.fov = func(wep, pl, origin*1, angles*1, fov)
+	 		end 
+	 	end
+	 	
+	 	if(pl:Alive()) then
+	 		view.origin = view.origin - Vector(0, 0, 40)
 	 	end
 	end
  	

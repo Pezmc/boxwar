@@ -4,18 +4,30 @@ AddCSLuaFile("player_class/class_box.lua")
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("sh_player.lua")
 
--- This file is only run on the server
+-- Run the shared file
 include("sh_init.lua")
+
+-- Load server only files
 include("maze.lua")
+include("lib/json.lua")
+include("toolkit.lua")
+
+-- Currently in debug?
+debugMode = true
+
+-- Count how many boxes there are
+totalMazeBoxes = 0
+currentMazeBoxes = 0
 
 -- Called when the gamemode is initialized.
 function Initialize()
 	game.ConsoleCommand("mp_flashlight 1\n")
+	
+	-- See Maze.Lua
+	timer.Simple(1,CreateMazes)
+	
 end
 hook.Add("Initialize", "BoxWar_Initialize", Initialize)
-
--- See Maze.Lua
-hook.Add("InitPostEntity","SpawnTheProps",timer.Simple(1,SpawnBoxMaze))
 
 -- Called when a player leaves.
 function PlayerDisconnected(pl)
@@ -25,7 +37,25 @@ hook.Add("PlayerDisconnected", "BoxWar_PlayerDisconnected", PlayerDisconnected)
 
 -- If someone dies, delete their prop!
 function PlayerDied( player, weapon, killer )
- 	player:RemoveProp()
+	-- Kill the player and remove their prop.
+	player:SetModel("models/player/leet.mdl")
+	player:SetColor(Color(255,255,255,255))
+	player:CreateRagdoll()
+	
+	if not player:Alive() and ValidEntity( player:GetRagdollEntity() ) then
+	  local ent = player:GetRagdollEntity()
+	  local head = ent:GetPhysicsObjectNum( 10 )
+	  head:ApplyForceCenter( Vector(0,0,-100) )
+	end
+		
+	if (player.prop ~= nil)	then	
+		-- Smash the box
+		player.prop:PrecacheGibs()
+		player.prop:GibBreakClient(Vector(0,0,100))
+	end
+		  
+    -- Delete the prop
+	player:RemoveProp()
 end
 hook.Add( "PlayerDeath", "BoxWar_PlayerDeath", PlayerDied )
 
@@ -55,6 +85,20 @@ function GM:PlayerSpawn( pl )
 	SetBox(pl)
 end
 
+function GM:CanStartRound( iNum )
+     --if team.NumPlayers( TEAM_RED ) > 0 and team.NumPlayers( TEAM_BLUE ) > 0 then
+          return true
+     --else
+     --     return false
+     --end
+end
+
+-- THIS DOESN'T WORK YET
+function GM:OnRoundStart() 
+
+	
+	for _,p in ipairs(player.GetAll()) do p:PrintMessage( HUD_PRINTCENTER, "A new round has started!" ) end
+end
 --[[ Called whenever a player spawns and must choose a model.
 function GM:PlayerSetModel( pl )
 	player_manager.SetPlayerClass(pl, "player_box")
@@ -88,7 +132,7 @@ end
 function GM:PlayerSelectSpawn( pl )
     spawns = GetSpawnEnts()    
     spawnNumber = math.random( #spawns )
-    --print("Spawning user at spawn: " .. spawnNumber)
+    
     return spawns[spawnNumber]
 end
 
@@ -116,7 +160,7 @@ function SetBox ( pl )
 		--util.PrecacheModel(player_model)
 		pl:SetModel(player_model)
 		pl:SetRenderMode(RENDERMODE_TRANSALPHA)
-		pl:SetColor(Color(255, 255, 255, 125))
+		pl:SetColor(Color(255, 255, 255, 1))
 		--pl:SetRenderOrigin(Vector(0, 0, 20))
 		--pl:SetLocalPos(Vector(0,0,20))
 		
@@ -130,21 +174,18 @@ function SetBox ( pl )
 		pl.prop:SetSolid(SOLID_BBOX)
 		pl.prop:SetParent(pl)
 		pl.prop:Spawn()
+		
 		pl.angerLevel = 0;
 	
 		-- Set initial player max health.
 		pl.prop.max_health = 100
 		pl.prop.health = 100
 		
-	
-		--[[ Calculate hull based on prop size.
-		local hull_xy_max 	= math.Round(math.Max(pl.prop:OBBMaxs().x, pl.prop:OBBMaxs().y))
-		local hull_xy_min 	= hull_xy_max * -1
-		local hull_z 		= math.Round(pl.prop:OBBMaxs().z)
-	
-		-- Set player hull server side.
-		pl:SetHull(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
-		pl:SetHullDuck(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))]]
+		-- Set player info
+		pl:SetJumpPower( 250 )
+		pl:SetRunSpeed(250) --default 500
+		pl:SetWalkSpeed(125) --default 250
+		pl:DrawWorldModel(false);
 		pl:SetHealth(100)
 	
 		-- Set the player hull client side
@@ -158,35 +199,16 @@ end
 
 
 -- Called when an entity takes damage.
-function EntityTakeDamage( target, dmginfo )
+--[[function EntityTakeDamage( target, dmginfo )
 
-	local attacker 	= dmginfo:GetAttacker()
-	local inflictor = dmginfo:GetInflictor()
-
-	if target && !target:IsPlayer() && target:GetClass() != "box_prop" && attacker && attacker:IsPlayer() && attacker:Alive() then
-		
-		--[[
-				-- If prop is now dead, take damage
-		if(target:Health() <= 0)
-			attacker:SetHealth(attacker:Health() - math.ceil(target:GetMaxHealth() / 10)) --shoot a non prop take 10% damage 
-		end
-		]]
-
-		attacker:SetHealth(attacker:Health() - math.ceil(dmginfo:GetDamage() / 10)) --shoot a non prop take 10% damage 
-
-		if attacker:Health() <= 0 then
-
-			PrintMessage( HUD_PRINTTALK, attacker:Name() .. " felt guilty for hurting so many innocent boxes and committed suicide.")
-			attacker.prop:GibBreakClient(attacker.prop:GetPos())
-			attacker:RemoveProp()
-			attacker:Kill()
-
-		end
-
-	end
+	
 
 end
-hook.Add("EntityTakeDamage", "PropHunt_EntityTakeDamage", EntityTakeDamage)
+hook.Add("EntityTakeDamage", "PropHunt_EntityTakeDamage", EntityTakeDamage)]]
+
+--[[function GM:EntityRemoved( ent )
+	print("Box dead?")
+end]]
 
 -- This is called when somebody tries to pick up and object
 function GM:AllowPlayerPickup(ply, ent)
@@ -226,8 +248,8 @@ function Think()
 	end
 
 
-	--[[ Calculate the location of every Prop's prop entity.
-	for _, pl in pairs(player.GetAll()) do
+	--Calculate the location of every Prop's prop entity.
+	--[[for _, pl in pairs(player.GetAll()) do
 
 		-- Check for a valid player/prop, and if they aren't freezing their prop.
 		if pl && pl:IsValid() && pl:Alive() && pl.prop && pl.prop:IsValid()  && !(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then

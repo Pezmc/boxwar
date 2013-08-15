@@ -25,6 +25,8 @@ GM.NoAutomaticSpawning		= true
 GM.NoNonPlayerPlayerDamage	= true
 GM.NoPlayerPlayerDamage 	= true
 
+GM.Help = "Find and kill the other boxes!"
+
 --Called when the game starts
 function GM:Initialize()
 	self.BaseClass.Initialize( self )

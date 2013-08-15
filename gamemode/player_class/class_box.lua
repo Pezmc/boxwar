@@ -17,6 +17,7 @@ function PLAYER:Loadout()
 	self.Player:GiveAmmo( 400, "SMG1" )
 	self.Player:GiveAmmo( 50, "pistol" )
 	
+	self.Player:Give( "weapon_crowbar" )
 	self.Player:Give( "weapon_pistol" )
 	self.Player:Give( "weapon_shotgun" )
 	self.Player:Give( "weapon_smg1" )
@@ -26,6 +27,7 @@ end
 
 function PLAYER:Spawn()
 	BaseClass.Spawn( self ) -- This is a must have
+	self.Player:DrawWorldModel(false)
 end
 
 -- Called on spawn

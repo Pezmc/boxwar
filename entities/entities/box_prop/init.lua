@@ -35,17 +35,7 @@ function ENT:OnTakeDamage(dmg)
 		if self.health <= 0 then
 
 			-- Kill the player and remove their prop.
-			pl:KillSilent()
-			
-			self:PrecacheGibs()
-			
-			--@todo, spawn a ragdol here?
-			-- Smash the prop
-			self:GibBreakClient(self:GetPos())
-			--self:GibBreakServer(self:GetPos())
-		    
-		    -- Delete the prop
-			pl:RemoveProp()
+			pl:Kill()
 
 			-- Find out what player should take credit for the kill.
 			if inflictor && inflictor == attacker && inflictor:IsPlayer() then
@@ -95,7 +85,7 @@ function ENT:Think()
 		local playerAngry = false
 		if(pl.angerLevel > 50) then
 			playerAngry = true
-			local color = math.floor(((pl.angerLevel-50) + 1) / 4);
+			local color = math.floor(((pl.angerLevel-50) + 1) / 2);
 			if(color > 128) then color = 128; end --don't let the player get too red
 			
 			pl.prop:SetColor(Color(255,255-color,255-color,255));
