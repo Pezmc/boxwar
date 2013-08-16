@@ -116,6 +116,6 @@ function ENT:Think()
 	self:CalculateBoxPosition()
 
 	-- Calculate how red the box is
-	--self:CalculateBoxAnger()
+	self:CalculateBoxAnger()
 	
 end
