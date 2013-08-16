@@ -66,7 +66,7 @@ function ENT:OnTakeDamage(dmg)
 			
 			-- Bonus health to player and their box
 			attacker:SetHealth(math.Clamp(attacker:Health() + 25, 1, 100)) 
-			if(attacker.prop:IsValid()) then
+			if(attacker.prop ~= nil and attacker.prop:IsValid()) then
 				attacker.prop.health = math.Clamp(attacker.prop.health + 25, 1, 100)
 			end
 
@@ -130,7 +130,7 @@ function ENT:Think()
 		--print("Info:")
 		--print(pl:GetPos())
 		--print(self:GetPos())
-		--self:SetLocalPos(Vector(0, , ))
+		self:SetLocalPos(Vector(0, 0, -20))
 		--self:SetPos(pl:GetPos() + Vector(0, 0, -self:OBBMins().z))
 		--print(self:GetPos())
 		--self:SetAngles(m:GetAngles())
