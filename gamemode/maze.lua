@@ -1,3 +1,20 @@
+-- == MAZE ENUMS == --
+-- Hollow enum
+local MAZE_WALL = "#"
+local MAZE_PATH = " "
+local MAZE_WIDE_PATH = "_"
+
+-- Hollow enum
+local RANDOM_HOLLOW = "H"
+local CENTER_HOLLOW = "C"
+
+-- Double square direction enums
+local DOUBLE_UP = "↑"
+local DOUBLE_RIGHT = "→"
+local DOUBLE_DOWN = "↓"
+local DOUBLE_LEFT = "←"
+local DOUBLE_EMPTY = "-"
+
 -- Load, then generate, then spawn a maze
 function CreateMazes()
 	totalMazeBoxes = 0;
@@ -14,14 +31,17 @@ function CreateMazes()
 		return
 	end
 	
+	local mazeCount = 0
+	
 	-- Create a maze for each one specified
 	for _, mazeConfig in pairs(mazeConfigs['mazes']) do
-        CreateMazeFromConfig(mazeConfig);
+        CreateMazeFromConfig(mazeConfig)
+        mazeCount = mazeCount + 1
     end
     
     -- Set the current maze box count
 	currentMazeBoxes = totalMazeBoxes
-	print("INFO: Generated " .. #mazeConfigs['mazes'] .. " mazes.")
+	print("INFO: Generated " .. mazeCount .. " mazes.")
 end
 
 -- Generate and spawn a maze from a config
@@ -52,10 +72,18 @@ function CreateMazeFromConfig(mazeConfig)
 	-- Generate the maze
 	mazeGrid = GenerateMaze(xWidth, yWidth)
 
+	-- Add double width paths to the maze
+	mazeGrid = AddDoubleWidthPaths(mazeGrid,xWidth,yWidth)
+
 	-- Make a hole in the middle of the maze
 	local xHoleWidth = math.floor(xWidth / 10)
 	local yHoleWidth = math.floor(yWidth / 10)
 	mazeGrid = HollowMazeGrid(mazeGrid, xHoleWidth, yHoleWidth, xWidth, yWidth)
+	
+	-- Make some random holes throughout the map
+	local holeCount = math.ceil(xWidth / 5)
+	print(holeCount)
+	RandomHollows(mazeGrid, holeCount, xHoleWidth, yHoleWidth, xWidth, yWidth)
 	
 	-- Add double width squares to the maze
 	mazeGrid = AddDoublesToMazeGrid(mazeGrid, xWidth, yWidth) 
@@ -65,6 +93,9 @@ function CreateMazeFromConfig(mazeConfig)
 	
 	-- Spawn the maze into the map
 	SpawnBoxMaze(mazeGrid, xWidth, yWidth, minX, maxY, minY, maxY, minZ, maxZ, boxWidth) 
+	
+	-- Print info about spawned weapons
+	PrintWeaponCounts()
 end
 
 -- Try and load the maze config file from the disk
@@ -140,14 +171,14 @@ function GenerateMaze(xWidth, yWidth)
     for x=0,xWidth do
       grid[x] = {}     -- create a new row 
       for y=0,yWidth do
-        grid[x][y] = 1 -- 1 == wall, 0 == hole/maze
+        grid[x][y] = MAZE_WALL -- 1 == wall, 0 == hole/maze
       end
     end
     
     -- Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
     local randomX = math.Round(xWidth/2)
     local randomY = math.Round(yWidth/2)
-    grid[randomX][randomY] = 0 -- part of the maze
+    grid[randomX][randomY] = MAZE_PATH -- part of the maze
     
     -- iterate through direct neighbors of node
     for i=-1,1 do
@@ -155,7 +186,7 @@ function GenerateMaze(xWidth, yWidth)
     		if(!(i==0&&j==0||i!=0&&j!=0)) then --only direct neighbors and not self
     			if(randomX + i >= 0 || randomX + i <= xWidth) then --if inside the maze on x
     				if(randomY + j >= 0 || randomY + j <= yWidth) then --if inside the maze on y
-    					if(grid[randomX + i][randomY + j] != 0) then -- if the chozen square isn't a "maze"
+    					if(grid[randomX + i][randomY + j] != MAZE_PATH) then -- if the chozen square isn't a "maze"
     						walls = {next = walls, x = randomX + i, y = randomY + j, parent = {x = randomX, y = randomY}} -- add the wall to the list
     					end
     				end
@@ -192,7 +223,7 @@ function GenerateMaze(xWidth, yWidth)
     	-- Get the opposite cell
 	    opposite = nil
 	    
-		if( chosenWall.x - chosenWall.parent.x !=0 ) then -- if the parent is in X
+		if( chosenWall.x - chosenWall.parent.x != 0 ) then -- if the parent is in X
 				opposite = { x = chosenWall.x + (chosenWall.x - chosenWall.parent.x),
 							 y = chosenWall.y,
 							 parent = { x = chosenWall.x, y = chosenWall.y }}
@@ -210,12 +241,12 @@ function GenerateMaze(xWidth, yWidth)
 		end
 		
 		-- If the cell on the opposite side isn't in the maze yet
-		if( grid[chosenWall.x][chosenWall.y] == 1
-			&& opposite != nil && grid[opposite.x][opposite.y] == 1 ) then
+		if( grid[chosenWall.x][chosenWall.y] == MAZE_WALL
+			&& opposite != nil && grid[opposite.x][opposite.y] == MAZE_WALL ) then
 		
 			-- Make the wall a passage and mark the cell on the opposite side as part of the maze.
-			grid[chosenWall.x][chosenWall.y] = 0
-			grid[opposite.x][opposite.y] = 0
+			grid[chosenWall.x][chosenWall.y] = MAZE_PATH
+			grid[opposite.x][opposite.y] = MAZE_PATH
 			
 			-- Add the neighboring walls of the cell to the wall list.
 			-- But if any only if they are not already in the list
@@ -225,9 +256,8 @@ function GenerateMaze(xWidth, yWidth)
 		    		if(!(i==0&&j==0||i!=0&&j!=0)) then --only direct neighbors and not self
 		    			if(opposite.x + i >= 0 && opposite.x + i <= xWidth) then --if inside the maze on x
 		    				if(opposite.y + j >= 0 && opposite.y + j <= yWidth) then --if inside the maze on y
-		    					--print("Attempting to index ".. opposite.x + i .. ":" .. opposite.y + j)
-		    					--print("Grid size is " .. xWidth .. ":" .. yWidth)
-		    					if(grid[opposite.x + i][opposite.y + j] != 0) then -- if the chozen square isn't a "maze"
+		    				
+		    					if(grid[opposite.x + i][opposite.y + j] != MAZE_PATH) then -- if the chozen square isn't a "maze"
 		    						walls = {next = walls,
 		    								 x = opposite.x + i,
 		    								 y = opposite.y + j,
@@ -248,11 +278,6 @@ function GenerateMaze(xWidth, yWidth)
     return grid
 end
 
---[[	for x=math.floor(xWidth*0.40),math.ceil(xWidth*0.6) do
-		for y=math.floor(yWidth*0.40),math.ceil(yWidth*0.6) do
-			grid[x][y] = math.random(1,10) < 9 and 0 or 1; --% of times to be hollow
-		end]]
-
 -- Hollow the center of the provided grid
 function HollowMazeGrid(grid, xHoleWidth, yHoleWidth, xWidth, yWidth)
 
@@ -262,38 +287,120 @@ function HollowMazeGrid(grid, xHoleWidth, yHoleWidth, xWidth, yWidth)
 		-- For the center yHoleWidth tiles
 		for y=math.floor(yWidth/2-yHoleWidth/2),
 			  math.ceil(yWidth/2+yHoleWidth/2) do
-			grid[x][y] = math.random(1,10) < 9 and 0 or 1; --% of times to be hollow
+			  
+			-- Make a hole
+			if(math.random(1,10) <= 8) then
+				grid[x][y] = CENTER_HOLLOW
+			end
 		end
 	end
 	
 	return grid
 end
 
--- Double square direction enums
-local DOUBLE_UP = "↑"
-local DOUBLE_RIGHT = "→"
-local DOUBLE_DOWN = "↓"
-local DOUBLE_LEFT = "←"
-local DOUBLE_EMPTY = "_"
+-- Make random hallows in the grid
+function RandomHollows(grid, count, xMaxWidth, yMaxWidth, xWidth, yWidth)
+
+	local xHoleWidth = xMaxWidth
+	local yHoleWidth = yMaxWidth
+	for c=1,count do
+		-- Make a hole
+		grid = RandomHollow(grid, xHoleWidth, yHoleWidth, xWidth, yWidth)
+		
+		-- Make a little smaller each time
+		xHoleWidth = math.ceil(xHoleWidth * 0.8) --won't get smaller than 4
+		yHoleWidth = math.ceil(yHoleWidth * 0.8)
+	end
+	
+	return grid
+end
+
+-- Make single random hollow
+function RandomHollow(grid, xHoleWidth, yHoleWidth, xWidth, yWidth)
+	-- Choose random start/end points
+	xStart = math.random(1,xWidth)
+	yStart = math.random(1,yWidth)
+	
+	-- don't go outside the map
+	xEnd = math.Clamp(xStart + xHoleWidth,1,xWidth)
+	yEnd = math.Clamp(yStart + yHoleWidth,1,yWidth)
+	
+	-- Make the hole
+	for x=xStart,xEnd do
+		for y=yStart,yEnd do
+			if math.random(1,10) <= 8 then
+				grid[x][y] = RANDOM_HOLLOW;
+			end
+		end
+	end
+
+	return grid
+end
+
+-- Find a few paths and make them wider 
+function AddDoubleWidthPaths(grid,xWidth,yWidth)
+	local requiredLength = xWidth*0.3
+
+	for y=1,yWidth do	
+		for x=1,xWidth do
+						
+			if(grid[x][y] == MAZE_PATH) then
+				if(x+requiredLength < xWidth) then
+					local valid = true
+					local pathX = x
+					local xEndPoint = x+requiredLength
+					
+					-- Search right to see if this is valid
+					while(valid and pathX < xEndPoint) do
+						if(grid[pathX][y] != MAZE_PATH) then valid = false end
+						pathX = pathX + 1 -- move right
+					end
+					
+					-- If we got to the end this must be a valid path
+					if (valid and math.random(0,1) == 1) then				
+						-- Reset x
+						pathX = x
+						
+						-- Above or below in Y
+						local newPathY = y + 1
+						if(newPathY > yWidth) then
+							newPathY = y - 1
+						end
+						
+						-- Mark the entire path as double width
+						while(grid[pathX][y] == MAZE_PATH) do
+							grid[pathX][y] = MAZE_WIDE_PATH
+							grid[pathX][newPathY] = MAZE_WIDE_PATH
+							pathX = pathX + 1 -- move right
+						end
+					end
+						
+				end
+			end
+		end
+	end
+	
+	return grid
+end
 
 -- Add double width squars to the provided grid
 function AddDoublesToMazeGrid(grid, xWidth, yWidth) 
 		
 	-- Search for doubles
-	for x=0,xWidth do
-		for y=0,yWidth do
+	for x=1,xWidth do
+		for y=1,yWidth do
 			if(x > 1 && x < xWidth - 1 && y > 1 && y < yWidth - 1) then -- is this surrounded by valid cells?
 				if(math.random(1,10) <= 2 ) then -- 20% chance to look for a double 
 					local doubleWidthCell = nil
 					
 					 -- If this is a solid
-					if(grid[x][y] == 1) then
+					if(grid[x][y] == MAZE_WALL) then
 					
 						-- Check the nearby cell
-						if(grid[x][y+1] == 1) then doubleWidthCell = DOUBLE_UP --check "above"
-							elseif(grid[x+1][y] == 1) then doubleWidthCell = DOUBLE_RIGHT --check "right"
-							elseif(grid[x][y-1] == 1) then doubleWidthCell = DOUBLE_DOWN --check "below"
-							elseif(grid[x-1][y] == 1) then doubleWidthCell = DOUBLE_LEFT--check "left"
+						if(grid[x][y+1] == MAZE_WALL) then doubleWidthCell = DOUBLE_UP --check "above"
+							elseif(grid[x+1][y] == MAZE_WALL) then doubleWidthCell = DOUBLE_RIGHT --check "right"
+							elseif(grid[x][y-1] == MAZE_WALL) then doubleWidthCell = DOUBLE_DOWN --check "below"
+							elseif(grid[x-1][y] == MAZE_WALL) then doubleWidthCell = DOUBLE_LEFT--check "left"
 						end
 						
 						-- If we found a double that would fit, then set it and it's neighbour
@@ -339,7 +446,7 @@ function SpawnBoxMaze(grid, xWidth, yWidth, minX, maxY, minY, maxY, zMin, zMax, 
 			yPos = minY + boxWidth * y;
 			
 			-- If a wall spawn some boxes
-			if(grid[x][y]==1) then			
+			if(grid[x][y] == MAZE_WALL) then			
 				SpawnBoxWall(xPos, yPos, zMin, zMax, boxWidth);
 				
 			-- If this is a double box square
@@ -387,6 +494,10 @@ function SpawnBoxWall(xPos, yPos, zMin, zMax, boxSize)
 	local chance = 7; -- 7/10 chance to spawn box
 	local stopSpawn = false
 	
+	-- Current/min height in UNITS
+	local zHeight = 1
+	local zMaxHeight = math.Round((zMax - zMin) / boxSize)
+	
 	-- Create layers until we hit the roof
 	while(zPos < zMax and chance > 0 and not stopSpawn) do
 		if(math.random(0,10) <= chance) then 
@@ -398,11 +509,14 @@ function SpawnBoxWall(xPos, yPos, zMin, zMax, boxSize)
 			-- Put a spawnpoint on top
 			if(math.random(1,4) == 1) then
 				SpawnSpawnPoint(xPos, yPos, zPos - boxSize)
+			elseif(math.random(1,4) == 1) then
+				SpawnRandomWeapon(xPos, yPos, zPos - boxSize, zHeight, zMaxHeight)
 			end
 		end
 		
 		-- Go up one layer
-		zPos = zPos + boxSize;
+		zPos = zPos + boxSize
+		zHeight = zHeight + 1
 		
 		-- Reduce the chance each time
 		chance = math.floor(chance * 0.8) -- max height is ~four
@@ -516,6 +630,93 @@ function SpawnSpawnPoint(xPos, yPos, zPos)
 	spawn=ents.Create("info_player_axis")
 	spawn:SetPos(Vector(xPos, yPos, zPos))
 	spawn:Spawn()
+end
+
+local rankedWeapons = {"weapon_pistol", 
+					   "weapon_357",
+					   "weapon_smg1",
+					   "weapon_shotgun",
+					   "weapon_ar2",
+					   "weapon_crossbow",
+					   "weapon_rpg",
+					   "weapon_frag",
+					   "weapon_slam"}
+					   
+local SpawnedWeaponCount = {}
+local AdvancedSpawnedWeaponCount = {}
+
+-- Spawn a random weapon into the map, based on the current zPos
+function SpawnRandomWeapon(xPos, yPos, zPos, zHeight, zMaxHeight)
+	local weaponCount = #rankedWeapons;
+	local weaponDouble = (weaponCount / zMaxHeight) * zHeight + math.random(-1,1) - 1;
+	local chosenWeapon = 0
+	
+	-- Round down by default
+	if(math.random(1,10) <= 7) then
+		chosenWeapon = math.floor(weaponDouble);
+	else
+		chosenWeapon = math.ceil(weaponDouble);
+	end
+	
+	-- Avoid overflow
+	chosenWeapon = math.Clamp( chosenWeapon, 1, weaponCount )
+	
+	-- Make higher weapins much rarer
+	if(math.random(1,weaponCount) >= chosenWeapon) then
+
+		local weaponName = rankedWeapons[chosenWeapon]
+		
+		local ent = ents.Create(weaponName)
+		if not IsValid(ent) then print("ERROR:" .. weaponName .. " not a valid ent"); return false end
+		
+		-- Spawn in the entity
+		ent:SetPos(Vector(xPos, yPos, zPos))
+		ent:SetMoveType(MOVETYPE_NONE)
+		ent:SetVelocity( Vector(0, 0, 0) )
+		ent:Spawn()
+		
+		-- Disable physics on the weapon after spawn
+		local physObj = ent:GetPhysicsObject()
+		if physObj:IsValid( ) then physObj:EnableMotion( false ) end
+		
+		-- Log the weapons that were spawned		
+		if(SpawnedWeaponCount[weaponName] == nil) then
+			SpawnedWeaponCount[weaponName] = 0
+		end
+		SpawnedWeaponCount[weaponName] = SpawnedWeaponCount[weaponName] + 1
+		
+		-- If in debug keep advanced stats too
+		if(debugMode) then
+			if(AdvancedSpawnedWeaponCount[weaponName] == nil) then
+				AdvancedSpawnedWeaponCount[weaponName] = {}
+				for i=1,zMaxHeight do
+					AdvancedSpawnedWeaponCount[weaponName][i] = 0; 
+				end
+			end
+
+			AdvancedSpawnedWeaponCount[weaponName][zHeight] = AdvancedSpawnedWeaponCount[weaponName][zHeight] + 1			
+		end
+	end
+end
+
+function PrintWeaponCounts() 
+	print("INFO: Spawned weapons:")
+	
+	-- Extra detailed stats
+	if(debugMode) then
+		for key,heights in pairs(AdvancedSpawnedWeaponCount) do
+	    	print(" - " .. key)
+	    	for height,count in pairs(heights) do
+	    		print("   - " .. height .. " : " .. count)
+	    	end
+	    end
+	
+	-- Standars stats
+	else
+		for key,value in pairs(SpawnedWeaponCount) do
+	    	print(" - " .. key .. ": " .. value)
+	    end
+    end
 end
 
 -- Spawn a prop into the map that is solid & doesn't move 

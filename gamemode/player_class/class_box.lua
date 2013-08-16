@@ -13,14 +13,14 @@ function PLAYER:Loadout()
 
 	self.Player:RemoveAllAmmo()
 
-	self.Player:GiveAmmo( 20, "Buckshot" )
-	self.Player:GiveAmmo( 400, "SMG1" )
+	--self.Player:GiveAmmo( 20, "Buckshot" )
+	--self.Player:GiveAmmo( 400, "SMG1" )
 	self.Player:GiveAmmo( 50, "pistol" )
 	
 	self.Player:Give( "weapon_crowbar" )
 	self.Player:Give( "weapon_pistol" )
-	self.Player:Give( "weapon_shotgun" )
-	self.Player:Give( "weapon_smg1" )
+	--self.Player:Give( "weapon_shotgun" )
+	--self.Player:Give( "weapon_smg1" )
 	--self.Player:Give( "item_ar2_grenade" )
 	
 end

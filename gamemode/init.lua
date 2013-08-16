@@ -187,12 +187,20 @@ function SetBox ( pl )
 		pl:SetWalkSpeed(125) --default 250
 		pl:DrawWorldModel(false);
 		pl:SetHealth(100)
+		
+		-- Calculate new player hull slightly smaller than prop
+		local hull_xy_max 	= math.floor(math.Max(pl.prop:OBBMaxs().x, pl.prop:OBBMaxs().y) * 0.8)
+		local hull_xy_min 	= hull_xy_max * -1
+		local hull_z 		= math.floor(pl.prop:OBBMaxs().z * 0.8)
+		
+		-- Set player hull.
+		pl:SetHull(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
+		pl:SetHullDuck(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
 	
 		-- Set the player hull client side
 		umsg.Start("SetHull", pl)
 			umsg.Long(hull_xy_max)
 			umsg.Long(hull_z)
-			umsg.Short(new_health)
 		umsg.End()
 	end
 end
@@ -245,6 +253,11 @@ function Think()
 		if ( pl:KeyDown(IN_ATTACK) ) then
 			pl.angerLevel = pl.angerLevel + 1
 		end
+
+		if ( pl:KeyDown(IN_ATTACK2) ) then
+			--pl:GetActiveWeapon():SetNextSecondaryFire(CurTime()+1000) -- disable secondary fire?
+		end		
+		
 	end
 
 

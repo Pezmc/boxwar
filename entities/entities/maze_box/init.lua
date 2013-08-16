@@ -23,18 +23,28 @@ function ENT:OnTakeDamage(dmginfo)
 
 	if attacker && attacker:IsPlayer() && attacker:Alive() then
 	
+		-- Reduce box health by less if explosion
+		if(dmginfo:IsExplosionDamage()) then
+			dmginfo:SetDamage(math.ceil(dmginfo:GetDamage() / 3))
+		end
+		
+		-- Set prop health
 		self:SetHealth(self:Health() - dmginfo:GetDamage())
 
 		-- Check if the box should be dead.
 		if self:Health() <= 0 then
 			currentMazeBoxes = currentMazeBoxes - 1
 			self:PrecacheGibs()
-			self:GibBreakClient(self:GetPos())
+			self:GibBreakClient(dmginfo:GetDamageForce()) -- throw the gibs in the direction of the damage
 			self:Remove()
 		end
 
-		-- Deal with player damage
-		attacker:SetHealth(attacker:Health() - math.ceil(dmginfo:GetDamage() / 10)) --shoot a non prop take 10% damage 
+		-- Don't injur players for using explosives
+		if(!dmginfo:IsExplosionDamage()) then
+		
+			-- Deal with player damage
+			attacker:SetHealth(attacker:Health() - math.ceil(dmginfo:GetDamage() / 10)) --shoot a non prop take 10% damage 
+		end
 
 		if attacker:Health() <= 0 then
 

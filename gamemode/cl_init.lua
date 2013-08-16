@@ -26,22 +26,29 @@ hook.Add("PlayerBindPress", "AntiCrouch", function(ply, bind)
 end )
 
 -- Sets the player hull and the health status.
-function SetHull(um)
-
+function UserSetHull(um)
+	
 	hull_xy 	= um:ReadLong()
 	hull_z 		= um:ReadLong()
-	new_health 	= um:ReadShort()
+	SetHull(hull_xy, hull_z)
+	
+end
+usermessage.Hook("SetHull", UserSetHull)
 
-	--[[if IsValid(LocalPlayer()) then
+function SetHull(hull_xy, hull_z)
+
+	if IsValid(LocalPlayer()) then
 		LocalPlayer():SetHull(Vector(hull_xy * -1, hull_xy * -1, 0), Vector(hull_xy, hull_xy, hull_z))
 		LocalPlayer():SetHullDuck(Vector(hull_xy * -1, hull_xy * -1, 0), Vector(hull_xy, hull_xy, hull_z))
-		LocalPlayer():SetHealth(new_health)
+		print("Set hull")
 	else
-		print("Player not valid yet, can't set hull")
-	end]]
+		print("Player not valid yet, can't set hull, using a timer")
+		timer.Create("setHullAgain", 1, 1, function() 
+			SetHull(hull_xy, hull_z)
+		end)
+	end
 
 end
-usermessage.Hook("SetHull", SetHull)
 
 function GM:PlayerSpawn() 
 	local oldhands = ply:GetHands()

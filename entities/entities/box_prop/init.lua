@@ -30,6 +30,13 @@ function ENT:OnTakeDamage(dmg)
 		-- Set player health.
 		self.health = self.health - dmg:GetDamage()
 		pl:SetHealth(self.health)
+		
+		-- Damage the box
+		if(self.health < self.max_health * 0.25) then
+			self:SetModel("models/props_junk/wood_crate001a_damagedmax.mdl")
+		elseif(self.health < self.max_health * 0.5) then
+			self:SetModel("models/props_junk/wood_crate001a_damaged.mdl")
+		end
 
 		-- Check if the player should be dead.
 		if self.health <= 0 then
@@ -54,9 +61,14 @@ function ENT:OnTakeDamage(dmg)
 			PrintMessage( HUD_PRINTTALK, attacker:Name() .. " found and killed " .. pl:Name() .. ".")
 			if(attacker:IsPlayer()) then attacker:PrintMessage( HUD_PRINTCENTER, " You killed " .. pl:Name() .. "." ) end
 
-			-- Add points to the attacker's score and up their health.
+			-- Add points to the attacker's score.
 			attacker:AddFrags(1)
-			attacker:SetHealth(math.Clamp(attacker:Health() + 25, 1, 100)) -- 10 bonus health
+			
+			-- Bonus health to player and their box
+			attacker:SetHealth(math.Clamp(attacker:Health() + 25, 1, 100)) 
+			if(attacker.prop:IsValid()) then
+				attacker.prop.health = math.Clamp(attacker.prop.health + 25, 1, 100)
+			end
 
 		end
 
