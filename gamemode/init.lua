@@ -188,6 +188,9 @@ function SetBox ( pl )
 		pl:DrawWorldModel(false);
 		pl:SetHealth(100)
 		
+		pl:SetViewOffset( 	Vector( 0, 0, 22 ) ) -- I think this must base it on the prop so we must round up
+		pl:SetViewOffsetDucked( Vector( 0, 0, 36+22 ) )
+		
 		-- Calculate new player hull slightly smaller than prop
 		local hull_xy_max 	= math.floor(math.Max(pl.prop:OBBMaxs().x, pl.prop:OBBMaxs().y) * 0.8)
 		local hull_xy_min 	= hull_xy_max * -1

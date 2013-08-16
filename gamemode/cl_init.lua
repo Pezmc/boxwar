@@ -115,9 +115,9 @@ function GM:CalcView(pl, origin, angles, fov)
 	 		end 
 	 	end
 	 	
-	 	if(pl:Alive()) then
+	 	--[[if(pl:Alive()) then
 	 		view.origin = view.origin - Vector(0, 0, 40)
-	 	end
+	 	end]]
 	end
  	
  	return view 
