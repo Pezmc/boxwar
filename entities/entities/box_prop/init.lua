@@ -13,6 +13,8 @@ function ENT:Initialize()
 	--self:SetMoveType( MOVETYPE_VPHYSICS )   -- after all, gmod is a physics
 	self:SetSolid( SOLID_VPHYSICS )         -- Toolbox
 	self.health = 100
+	
+	self:CalculateMinMax()
 
 end 
 
@@ -26,6 +28,8 @@ function ENT:OnTakeDamage(dmg)
 
 	-- Check player and attacker are valid.
 	if pl && pl:IsValid() && pl:Alive() && pl:IsPlayer() && attacker:IsPlayer() && dmg:GetDamage() > 0 then
+
+		print(attacker:Name() .. " shot " .. pl:Name())
 
 		-- Set player health.
 		self.health = self.health - dmg:GetDamage()
@@ -78,17 +82,7 @@ function ENT:OnTakeDamage(dmg)
 
 end 
 
-local lastYaw = 0
-
-function ENT:Think()
-
-	--[[self.R = self.R or 0; -- if R is nil, make it 0
- 
-	if(self.R < 255) then
-			self:SetColor(Color(self.R, 0, 0, 255)); -- actually set the color
-			self.R = self.R + 1; -- increment R
-	end]]
-
+function ENT:CalculateBoxAnger() 
 	local pl = self:GetOwner()
 	
 	if pl:IsValid() then
@@ -113,27 +107,15 @@ function ENT:Think()
 		if(pl.angerLevel > 0) then
 			pl.angerLevel = pl.angerLevel - 10
 		end
-	
-		--[[
-	
-		local m = Matrix()
-				
-		-- If the player is holding down attack 2 don't rotate
-		if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
-			m:SetAngles(Angle(0, lastYaw, 0)) --only the yaw (rotation in z)
-		else
-			local angles = pl:GetAngles()
-			m:SetAngles(Angle(0, angles.y, 0)) --only the yaw (rotation in z)
-			lastYaw = angles.y
-		end]]
-		
-		--print("Info:")
-		--print(pl:GetPos())
-		--print(self:GetPos())
-		self:SetLocalPos(Vector(0, 0, -20))
-		--self:SetPos(pl:GetPos() + Vector(0, 0, -self:OBBMins().z))
-		--print(self:GetPos())
-		--self:SetAngles(m:GetAngles())
-		--self:SetAngles(Angle(0,0,0))
 	end
+end
+
+function ENT:Think()
+
+	-- Use the shared server and client method to calculate the current position
+	self:CalculateBoxPosition()
+
+	-- Calculate how red the box is
+	--self:CalculateBoxAnger()
+	
 end
