@@ -2,7 +2,8 @@
 -- Hollow enum
 local MAZE_WALL = "#"
 local MAZE_PATH = " "
-local MAZE_WIDE_PATH = "_"
+local MAZE_WIDE_PATH_X = "_"
+local MAZE_WIDE_PATH_Y = "|"
 
 -- Hollow enum
 local RANDOM_HOLLOW = "H"
@@ -339,7 +340,9 @@ end
 
 -- Find a few paths and make them wider 
 function AddDoubleWidthPaths(grid,xWidth,yWidth)
-	local requiredLength = xWidth*0.3
+	local requiredLength = xWidth*0.3 -- 1/3 of the map
+
+	local totalAddedPaths = 0
 
 	for y=1,yWidth do	
 		for x=1,xWidth do
@@ -357,7 +360,7 @@ function AddDoubleWidthPaths(grid,xWidth,yWidth)
 					end
 					
 					-- If we got to the end this must be a valid path
-					if (valid and math.random(0,1) == 1) then				
+					if (valid and (math.random(1,10) >= totalAddedPaths)) then				
 						-- Reset x
 						pathX = x
 						
@@ -368,17 +371,64 @@ function AddDoubleWidthPaths(grid,xWidth,yWidth)
 						end
 						
 						-- Mark the entire path as double width
-						while(grid[pathX][y] == MAZE_PATH) do
-							grid[pathX][y] = MAZE_WIDE_PATH
-							grid[pathX][newPathY] = MAZE_WIDE_PATH
+						while(pathX < xWidth && grid[pathX][y] == MAZE_PATH) do
+							grid[pathX][y] = MAZE_WIDE_PATH_X
+							grid[pathX][newPathY] = MAZE_WIDE_PATH_X
 							pathX = pathX + 1 -- move right
 						end
-					end
 						
+						-- If we can, skip the next column
+						if(y + 2 < yWidth) then
+							y = y + 2
+						end
+						
+						totalAddedPaths = totalAddedPaths + 1
+						
+					else  -- search in Y
+						if(y+requiredLength < yWidth) then
+							valid = true
+							local pathY = y
+							local yEndPoint = y+requiredLength
+							
+							-- Search up to see if this is valid
+							while(valid and pathY < yEndPoint) do
+								if(grid[x][pathY] != MAZE_PATH) then valid = false end
+								pathY = pathY + 1 -- move right
+							end
+							
+							-- Spawn a path in Y
+							if (valid and (math.random(1,10) >= totalAddedPaths))  then				
+								-- Reset x
+								pathY = y
+								
+								-- Above or below in Y
+								local newPathX = x + 1
+								if(newPathX > xWidth) then
+									newPathX = x - 1
+								end
+								
+								-- Mark the entire path as double width
+								while(pathY < yWidth && grid[pathY][x] == MAZE_PATH) do
+									grid[x][pathY] = MAZE_WIDE_PATH_Y
+									grid[newPathX][pathY] = MAZE_WIDE_PATH_Y
+									pathY = pathY + 1 -- move right
+								end
+								
+								-- If we can, skip the next row
+								if(x + 2 < xWidth) then
+									x = x + 2
+								end
+								
+								totalAddedPaths = totalAddedPaths + 1
+							end -- spawn in y
+						end -- fits in y
+					end	-- search in y
 				end
 			end
 		end
 	end
+	
+	print("INFO: Added "..totalAddedPaths.. " double width paths")
 	
 	return grid
 end
@@ -661,23 +711,30 @@ function SpawnRandomWeapon(xPos, yPos, zPos, zHeight, zMaxHeight)
 	-- Avoid overflow
 	chosenWeapon = math.Clamp( chosenWeapon, 1, weaponCount )
 	
-	-- Make higher weapins much rarer
+	-- Make higher weapons much rarer
 	if(math.random(1,weaponCount) >= chosenWeapon) then
 
 		local weaponName = rankedWeapons[chosenWeapon]
 		
 		local ent = ents.Create(weaponName)
+		--local ent = ents.Create("prop_physics")
 		if not IsValid(ent) then print("ERROR:" .. weaponName .. " not a valid ent"); return false end
+		--ent:SetModel( "models/weapons/w_crossbow.mdl" )
 		
 		-- Spawn in the entity
-		ent:SetPos(Vector(xPos, yPos, zPos))
+		ent:SetPos(Vector(xPos, yPos, zPos - ent:OBBMins().z/2))
 		ent:SetMoveType(MOVETYPE_NONE)
+		ent:SetAngles( Angle(0, 45, 90) )
 		ent:SetVelocity( Vector(0, 0, 0) )
 		ent:Spawn()
 		
 		-- Disable physics on the weapon after spawn
 		local physObj = ent:GetPhysicsObject()
-		if physObj:IsValid( ) then physObj:EnableMotion( false ) end
+		if physObj:IsValid( ) then
+			physObj:Wake()
+			physObj:EnableMotion( false )
+			physObj:EnableGravity( false )
+		end
 		
 		-- Log the weapons that were spawned		
 		if(SpawnedWeaponCount[weaponName] == nil) then
