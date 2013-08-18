@@ -37,23 +37,46 @@ hook.Add("PlayerDisconnected", "BoxWar_PlayerDisconnected", PlayerDisconnected)
 
 -- If someone dies, delete their prop!
 function PlayerDied( player, weapon, killer )
-	-- Kill the player and remove their prop.
-	player:SetModel("models/player/leet.mdl")
-	player:SetColor(Color(255,255,255,255))
-	player:CreateRagdoll()
-	
-	if not player:Alive() and ValidEntity( player:GetRagdollEntity() ) then
-	  local ent = player:GetRagdollEntity()
-	  local head = ent:GetPhysicsObjectNum( 10 )
-	  head:ApplyForceCenter( Vector(0,0,-100) )
-	end
-		
+	-- Create an invisible prop to copy
+    local invisibleDoll = ents.Create("prop_physics")
+    invisibleDoll:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+    invisibleDoll:SetModel("models/Humans/Group01/Male_05.mdl")
+    invisibleDoll:SetAngles(player:GetAngles())
+    invisibleDoll:SetPos( player:GetPos() )
+    invisibleDoll:SetColor(Color(0, 0, 0, 0)) 
+    invisibleDoll:Spawn()
+
+    -- Set the invisible prop to crouch
+    sequence = invisibleDoll:LookupSequence("roofidleone")
+	invisibleDoll:SetPlaybackRate( 1.0 )
+	invisibleDoll:SetSequence(sequence)
+	invisibleDoll:ResetSequence( sequence )
+	invisibleDoll:SetCycle( 1 )
+    
+    -- Spawn a ragdoll for the player
+    local doll = ents.Create("prop_ragdoll")
+    doll:SetParent(invisibleDoll)
+    doll:AddEffects(EF_BONEMERGE)
+    doll:SetModel( "models/Humans/Group01/Male_05.mdl" )
+    --doll:SetModel( player:GetModel() )
+    doll:SetPos( player:GetPos() )
+    doll:SetAngles( player:GetAngles() )
+    doll:Spawn()
+    doll:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+    
+    -- Link the ragdoll to the invisible, then remove the invisible
+    doll:SetParent()
+    invisibleDoll:Remove()
+    
+    -- Smash the box
 	if (player.prop ~= nil)	then	
-		-- Smash the box
 		player.prop:PrecacheGibs()
 		player.prop:GibBreakClient(Vector(0,0,100))
 	end
-		  
+	
+	-- Safely remove the doll after 60 seconds
+    SafeRemoveEntityDelayed(doll, 60)
+				  
     -- Delete the prop
 	player:RemoveProp()
 end
@@ -167,8 +190,8 @@ function SetBox ( pl )
 		-- Then spawn a new box around them
 		pl.prop = ents.Create("box_prop")
 		--pl.prop:SetNotSolid(true)
-		pl.prop:SetOwner(pl)
 		
+		pl.prop:SetOwner(pl)
 		pl.prop:SetPos(pl:GetPos())
 		pl.prop:SetAngles(pl:GetAngles())
 		pl.prop:SetSolid(SOLID_BBOX)
