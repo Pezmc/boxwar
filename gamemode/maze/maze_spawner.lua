@@ -212,9 +212,9 @@ local rankedWeapons = {"weapon_pistol",
 					   "weapon_shotgun",
 					   "weapon_ar2",
 					   "weapon_crossbow",
-					   "weapon_rpg",
 					   "weapon_frag",
-					   "weapon_slam"}
+					   "weapon_slam",
+					   "weapon_rpg"}
 					   
 local SpawnedWeaponCount = {}
 local AdvancedSpawnedWeaponCount = {}
@@ -222,7 +222,7 @@ local AdvancedSpawnedWeaponCount = {}
 -- Spawn a random weapon into the map, based on the current zPos
 function SpawnRandomWeapon(xPos, yPos, zPos, zHeight, zMaxHeight)
 	local weaponCount = #rankedWeapons;
-	local weaponDouble = (weaponCount / zMaxHeight) * zHeight + math.random(-1,1) - 1;
+	local weaponDouble = (weaponCount / zMaxHeight) * zHeight + math.random(-1,1) * 0.5;
 	local chosenWeapon = 0
 	
 	-- Round down by default
