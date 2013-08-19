@@ -34,3 +34,9 @@ function vardump(value, depth, key)
     print(spaces..linePrefix.."("..type(value)..") "..tostring(value))
   end
 end
+
+function printDebug(message)
+	if(DEBUG_MODE) then
+		print("DEBUG: " .. message)
+	end
+end

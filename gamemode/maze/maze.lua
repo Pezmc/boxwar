@@ -98,7 +98,6 @@ function CreateMazeFromConfig(mazeConfig)
 	
 	-- Make some random holes throughout the map
 	local holeCount = math.ceil(xWidth / 5)
-	print(holeCount)
 	RandomHollows(mazeGrid, holeCount, xHoleWidth, yHoleWidth, xWidth, yWidth)
 	
 	-- Add double width squares to the maze
