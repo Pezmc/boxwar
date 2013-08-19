@@ -5,17 +5,33 @@ AddCSLuaFile("shared.lua")
 -- Load shared
 include("shared.lua")
 
+-- Force download (downloads related files automatically!)
+resource.AddFile("materials/models/boxwar/boxwar_crate01.vmt")
+resource.AddFile("materials/models/boxwar/boxwar_crate02.vmt")
+
+resource.AddFile("models/boxwar/boxwar_crate.mdl")
+
+
 -- Called when the entity loads
 function ENT:Initialize()
 
+	-- Set up entity defaults
 	self:SetModel("models/props_junk/wood_crate001a.mdl")
-	self:PhysicsInit( SOLID_VPHYSICS )      -- Make us work with physics,
-	--self:SetMoveType( MOVETYPE_VPHYSICS )   -- after all, gmod is a physics
-	self:SetSolid( SOLID_VPHYSICS )         -- Toolbox
-	self.health = 100
 	
+	-- Physics and bounding
+	self:SetSolid(SOLID_BBOX)
+	self:PhysicsInit( SOLID_VPHYSICS )      -- Make us work with physics,
+	self:SetSolid( SOLID_VPHYSICS )         -- Toolbox
+	
+	-- Collisions
+	self:SetCollisionGroup( COLLISION_GROUP_PLAYER ) -- Collision group for player
+	
+	-- Health
+	self.health = 100 -- Default health
+	self.max_health = 100
+	
+	-- Bounding box
 	self:CalculateMinMax()
-
 end 
 
 -- Called when box takes damage.
@@ -28,8 +44,14 @@ function ENT:OnTakeDamage(dmg)
 
 	-- Check player and attacker are valid.
 	if pl && pl:IsValid() && pl:Alive() && pl:IsPlayer() && attacker:IsPlayer() && dmg:GetDamage() > 0 then
-
-		print(attacker:Name() .. " shot " .. pl:Name())
+	
+		-- You can't shoot your own box
+		if( pl == attacker ) then
+			return
+		end
+			
+		-- Output the shot
+		printDebug(attacker:Name() .. " shot " .. pl:Name())
 
 		-- Set player health.
 		self.health = self.health - dmg:GetDamage()
@@ -47,7 +69,7 @@ function ENT:OnTakeDamage(dmg)
 
 			-- Kill the player and remove their prop.
 			pl:Kill()
-
+			
 			-- Find out what player should take credit for the kill.
 			if inflictor && inflictor == attacker && inflictor:IsPlayer() then
 
