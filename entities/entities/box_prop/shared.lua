@@ -20,16 +20,29 @@ function ENT:CalculateBoxPosition()
 	if pl:IsValid() then
 
 		-- Shift the box up by it's min Z position
-		self:SetPos(self:GetOwner():GetPos() + Vector(0,0,-min.z))
+		local playerPos = self:GetOwner():GetPos()
+		self:SetPos(Vector(0,0,-min.z))
+		--print("Player then owner:")
+		--print(self:GetOwner():GetPos())
+		--print(self:GetPos())
+		
+		
+		local playerAngles = self:GetOwner():GetAngles()
+		--print(self:GetOwner():GetAngles())
+		--print(self:GetOwner():GetLocalAngles())
+		--print(self:GetAngles())
+		--print(self:GetLocalAngles())
+		--self:SetAngles(Angle(-playerAngles.p, -playerAngles.y, -playerAngles.r))
+		--print(self:GetAngles())
 			
-		-- If the player is holding down attack 2 don't rotate
-		if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
-			self:SetAngles(Angle(0, self.lastYaw, 0)) --only the yaw (rotation in z)
+		--[[ If the player is holding down attack 2 don't rotate
+		--if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
+			self:SetLocalAngles(Angle(0, self.lastYaw, 0)) --only the yaw (rotation in z)
 		else
 			local angles = pl:GetAngles()
-			self:SetAngles(Angle(0,angles.y,0))
+			self:SetLocalAngles(Angle(0,angles.y,0))
 			self.lastYaw = angles.y
-		end
+		end]]
 	
 		--print(self.lastYaw)
 	end
@@ -37,5 +50,5 @@ function ENT:CalculateBoxPosition()
 end
 
 function ENT:Think() 
-	self:CalculateBoxPosition()
+	--self:CalculateBoxPosition()
 end
