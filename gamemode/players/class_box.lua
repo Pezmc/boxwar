@@ -30,13 +30,25 @@ end
 -- Called on player spawn
 function PLAYER:Spawn()
 	BaseClass.Spawn( self ) -- This is a must have
-	self.Player:DrawWorldModel(false) -- attempt to hide the players weapon
+	
+	-- Store the players model
+	self.Player.selectedPlayerModel = self.Player:GetModel()
+	
+	-- Attempt to hide the players weapon
+	self.Player:DrawWorldModel(false)
 	
 	-- Hide the player model
 	self:HidePlayer()
 	
+	-- Allow use of flash light
+	self.Player:Flashlight( false )
+	self.Player:AllowFlashlight( true )
+	
 	-- Set the players anger
 	self.Player.angerLevel = 0;
+	
+	-- Player doesn't have a box yet
+	self.Player.boxSpawned = false
 	
 	-- Turn the player into a box
 	self:BoxPlayer()
@@ -47,7 +59,7 @@ function PLAYER:HidePlayer()
 	local model = "models/Gibs/Antlion_gib_small_3.mdl"
 		
 	util.PrecacheModel(model)
-	self.Player:SetModel(player_model)
+	self.Player:SetModel(model)
 	self.Player:SetRenderMode(RENDERMODE_TRANSALPHA)
 	self.Player:SetColor(Color(255, 255, 255, 1))
 end
@@ -58,7 +70,6 @@ function PLAYER:BoxPlayer()
 	-- Spawn in a box for the player
 	self:CreateBox()
 	
-
 	-- Set player info
 	self.Player:SetJumpPower( 250 )
 	self.Player:SetRunSpeed(250) --default 500
@@ -66,8 +77,9 @@ function PLAYER:BoxPlayer()
 	self.Player:SetHealth(100)
 	
 	-- Set player view	
-	self.Player:SetViewOffset( 	Vector( 0, 0, 30 ) ) -- I think this must base it on the prop so we must round up
-	self.Player:SetViewOffsetDucked( Vector( 0, 0, 36+25 ) )
+	local playerHeight = 30 -- slightly higher than half
+	self.Player:SetViewOffset( 	Vector( 0, 0, playerHeight ) )
+	self.Player:SetViewOffsetDucked( Vector( 0, 0, 36+playerHeight ) )
 		
 	-- Set the players hull on server and client
 	self:SetHull()
@@ -113,8 +125,12 @@ function PLAYER:CreateBox()
 end
 
 -- Called when the player changes their weapon to another one causing their viewmodel model to change
-function PLAYER:ViewModelChanged( Entity viewmodel, string old, string new )
-	self.Player:DrawWorldModel(false) -- attempt to hide the players weapon
+function PLAYER:ViewModelChanged( viewmodel, old, new )
+	if(SERVER) then
+		if(self.Player:IsValid()) then
+			self.Player:DrawWorldModel(false) -- attempt to hide the players weapon
+		end
+	end
 end
 
 player_manager.RegisterClass( "player_crate", PLAYER, "player_default" )
