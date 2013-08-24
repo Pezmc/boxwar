@@ -40,3 +40,24 @@ function printDebug(message)
 		print("DEBUG: " .. message)
 	end
 end
+
+-- Recursively adds everything in a directory to be downloaded by client
+function AddResourcesByDirectory(directory) 
+	local files, dirs = file.Find(directory.."/*", "GAME")
+	
+	-- Also check dirs
+	for _, fdir in pairs(dirs) do
+		-- If the first letter isn't a . recurce into that folder
+		if string.sub(fdir,1,1) != "." then
+			AddResourcesByDirectory(directory.."/"..fdir)
+		else
+			print("INFO: Ignored "..fdir.." when adding resourses");
+		end
+	end
+ 
+	-- Add files
+	for _,filename in pairs(files, true) do
+		resource.AddSingleFile(directory.."/"..filename)
+		printDebug(directory.."/"..filename)
+	end
+end

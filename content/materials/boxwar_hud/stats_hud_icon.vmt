@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "adrys_hud/stats_hud_icon"
+	"$translucent" 1
+}

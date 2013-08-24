@@ -8,8 +8,10 @@
 
 -- Code for the client
 AddCSLuaFile("sh_init.lua")
-AddCSLuaFile("players/class_box.lua")
 AddCSLuaFile("cl_init.lua")
+
+AddCSLuaFile("players/class_box.lua")
+AddCSLuaFile("cl_hud.lua")
 AddCSLuaFile("sh_player.lua")
 
 -- 'Global' variables
@@ -24,6 +26,10 @@ include("rounds.lua") -- handle game rounds
 include("spawns.lua") -- spawn point for users
 include("lib/json.lua") -- parse json
 include("lib/toolkit.lua") -- add lua functions
+
+-- Download hud resources
+AddResourcesByDirectory("materials/boxwar_hud")
+AddResourcesByDirectory("effects/boxwar_hud")
 
 -- Con var's
 CreateConVar("bw_roundtime_minutes", 10, FCVAR_NOTIFY, "The length of a round in minutes")
