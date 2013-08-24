@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "boxwar_hud/hud_clock"
+	"$translucent" 1
+}

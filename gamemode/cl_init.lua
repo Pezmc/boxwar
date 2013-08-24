@@ -1,6 +1,8 @@
 -- This file is only run on the client
 include("sh_init.lua")
 
+include("cl_hud.lua")
+
 -- Called immediately after starting the gamemode.
 function Initialize()
 	hull_z = 80
