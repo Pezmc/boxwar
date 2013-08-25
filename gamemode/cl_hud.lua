@@ -1,5 +1,5 @@
 function DrawAvatar()
-AvatarShouldDraw = 1
+	AvatarShouldDraw = 1
 end
 hook.Add("Initialize", "Avatardeestim", DrawAvatar)
 
@@ -40,7 +40,7 @@ function HUD()
 	
 	local CurrentHP = math.Round(User:Health())
 	local CurrentArmor = math.Round(User:Armor())
-	//local TheTime = os.date("%I:%M:%S %p")
+	--local TheTime = os.date("%I:%M:%S %p")
 	
 	-- Draw the hud
 	surface.SetDrawColor( 255, 255, 255, 255 )
@@ -62,30 +62,36 @@ function HUD()
 	surface.SetMaterial( HUD_Texture_Icon )
 	surface.DrawTexturedRect( StatsHUDposW, StatsHUDposH, StatsHUDwidth, StatsHUDheight )
 	
-	//surface.SetDrawColor( 255, 255, 255, 255 )
-	//surface.SetTexture( HUD_Texture_Hora )
-	//surface.DrawTexturedRect( clockHUDposW, clockHUDposH, clockHUDwidth, clockHUDheight )
+	--surface.SetDrawColor( 255, 255, 255, 255 )
+	--surface.SetTexture( HUD_Texture_Hora )
+	--surface.DrawTexturedRect( clockHUDposW, clockHUDposH, clockHUDwidth, clockHUDheight )
 	
 	-- Create fonts
 	fontData = {
 		font = "arial",
-		size = 16,
+		size = 14,
 		weight = 400,
 		antialias = true,
 		additive = true
 	}
 	
-	surface.CreateFont( "adrys_HUD_Font", fontData)
-	fontData.size = 11
-	surface.CreateFont( "adrys_HUD_Font2", fontData )
+	surface.CreateFont( "status_hud_font", fontData)
+	--fontData.size = 11
+	--surface.CreateFont( "adrys_HUD_Font2", fontData )
 	
 	-- Draw the font on the scren
-	draw.SimpleText(CurrentHP.."%" , "adrys_HUD_Font", StatsHUDposW + 124, StatsHUDposH + 39, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	draw.SimpleText(CurrentArmor.."%" , "adrys_HUD_Font", StatsHUDposW + 124, StatsHUDposH + 59, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	draw.SimpleText(CurrentHP.."%" , "status_hud_font", 
+					StatsHUDposW + 124, StatsHUDposH + 39,
+					Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					
+	draw.SimpleText(CurrentArmor.."%" , "status_hud_font",
+					StatsHUDposW + 124, StatsHUDposH + 59,
+					Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	
 	-- Draw the time
-	//draw.SimpleText(TheTime, "adrys_HUD_Font2", StatsHUDposW + 100, StatsHUDposH + 99, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	-- draw.SimpleText(TheTime, "adrys_HUD_Font2", StatsHUDposW + 100, StatsHUDposH + 99, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	
+	-- Draw the users avatar, only once
 	if AvatarShouldDraw == 1 then
 		local Avatar = vgui.Create("AvatarImage")
 		Avatar:SetPos(StatsHUDposW + 8, ScrH() - 93)
@@ -148,9 +154,9 @@ local BlurStartingHealth = 30
 local TargetBlurScale = 0
 local CurrentBlurScale = 0
 
-CreateClientConVar( "efectodesangre", 1, false, false )
+-- Draw the blur on the screen
 local function DoDamageEffect()
-	if GetConVarNumber( "efectodesangre" ) == 1 and LocalPlayer():Alive() then
+	if LocalPlayer():Alive() then
 		local minStrength,maxStrength = 0,3
 		
 		local hp = math.Clamp( LocalPlayer():Health(), 1, BlurStartingHealth )
@@ -189,6 +195,7 @@ local BleedStartingHealth = 40;
 local TargetBleedAlpha = 0.0;
 local CurrentBleedAlpha = 0.0;
 
+-- Draw the blood on screen
 local function DoDamageHUD()
 	if LocalPlayer():Alive() then
 		local hp = math.Clamp( LocalPlayer():Health(), 1, BleedStartingHealth )
