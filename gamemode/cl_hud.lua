@@ -142,41 +142,77 @@ local ScreenThrob_NextThrob = 0
 local ScreenThrob_Delay = 1.3
 local ScreenThrob_Enable = true
 
+-- Start bluring when their health hits this
+local BlurStartingHealth = 30
+
+local TargetBlurScale = 0
+local CurrentBlurScale = 0
+
 CreateClientConVar( "efectodesangre", 1, false, false )
 local function DoDamageEffect()
 	if GetConVarNumber( "efectodesangre" ) == 1 and LocalPlayer():Alive() then
 		local minStrength,maxStrength = 0,3
 		
-		local hp = math.Clamp( LocalPlayer():Health(), 0, 40 )
+		local hp = math.Clamp( LocalPlayer():Health(), 1, BlurStartingHealth )
 		
-		if hp ~= 40 then
-			local scale = 1 - ( hp / 40 )
+		if hp ~= BlurStartingHealth then
+			TargetBlurScale = 1 - ( hp / BlurStartingHealth )
+			
+			-- If there is a difference between our target and our current, update the current slightly
+			if (TargetBlurScale - CurrentBlurScale > 0) then
+				CurrentBlurScale = CurrentBlurScale + (TargetBlurScale - CurrentBlurScale) * 0.1
+				CurrentBlurScale = math.Clamp( CurrentBlurScale, 0, 1 )
+			end
 			
 			if ScreenThrob_NextThrob <= CurTime() then
 				ScreenThrob_NextThrob = CurTime() + ScreenThrob_Delay
 			end
+			
 			local throb = ScreenThrob_NextThrob - CurTime()
 			local calcthrob = throb / 1.3
 			
-			local str = scale * ( 1 + calcthrob )
+			local str = CurrentBlurScale * ( 1 + calcthrob )
 			str = math.Clamp( str, minStrength, maxStrength )
 			DrawBBlur( str )
+		else
+			-- Reset the scales
+			TargetBlurScale = 0
+			CurrentBlurScale = 0
 		end
 	end
 end
 hook.Add( "RenderScreenspaceEffects", "RenderDamageEffect", DoDamageEffect )
 
+-- What health level to start the pain effect
+local BleedStartingHealth = 40;
+
+local TargetBleedAlpha = 0.0;
+local CurrentBleedAlpha = 0.0;
+
 local function DoDamageHUD()
 	if LocalPlayer():Alive() then
-		local hp = math.Clamp( LocalPlayer():Health(), 0, 40 )
-		if hp ~= 40 then
-			local mat_alpha = 1 - ( hp / 40 )
+		local hp = math.Clamp( LocalPlayer():Health(), 1, BleedStartingHealth )
+		if hp ~= BleedStartingHealth then
+			-- Update the target based on current health
+			TargetBleedAlpha = 1 - ( hp / BleedStartingHealth )
 			
-			surface.SetDrawColor( 255, 255, 255, mat_alpha * 255 )
+			-- If there is a difference between our target and our current, update the current slightly
+			if (TargetBleedAlpha - CurrentBleedAlpha > 0) then
+				CurrentBleedAlpha = CurrentBleedAlpha + (TargetBleedAlpha - CurrentBleedAlpha) * 0.1
+				CurrentBleedAlpha = math.Clamp( CurrentBleedAlpha, 0, 1 )
+			end
+			
+			surface.SetDrawColor( 255, 255, 255, CurrentBleedAlpha * 255 )
 			--surface.SetTexture( Pain )
 			surface.SetMaterial( Pain )
 			surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
+		else
+			-- Reset target and current alpha's
+			TargetBleedAlpha = 0.0;
+			CurrentBleedAlpha = 0.0;
 		end
+		
+		
 	end
 end
 hook.Add( "HUDPaint", "RenderDamageEffect", DoDamageHUD )
