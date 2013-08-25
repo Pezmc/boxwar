@@ -11,7 +11,6 @@ resource.AddFile("materials/models/boxwar/boxwar_crate02.vmt")
 
 resource.AddFile("models/boxwar/boxwar_crate.mdl")
 
-
 -- Called when the entity loads
 function ENT:Initialize()
 
@@ -62,6 +61,36 @@ function ENT:OnTakeDamage(dmg)
 			self:SetModel("models/props_junk/wood_crate001a_damagedmax.mdl")
 		elseif(self.health < self.max_health * 0.5) then
 			self:SetModel("models/props_junk/wood_crate001a_damaged.mdl")
+		end
+
+		-- Human blood
+		DecalName = "Blood" --"Impact.Wood" --Impact.Wood, Blood
+		EffectName = "BloodImpact" --"BloodImpact"
+				
+		-- Perform a trace from the player, using their current velocity
+		local Trace = {}
+		Trace.start = dmg:GetDamagePosition()
+		Trace.endpos = Trace.start + dmg:GetDamageForce( ) * 5
+		Trace.filter = pl
+		local tr = util.TraceLine( Trace )
+		
+		print(tr.Entity)
+				
+		-- If we hit something
+		if ( tr.Hit && tr.HitPos:Distance( pl:GetPos() ) < 100 ) then
+		
+			-- Spawn some blood
+			util.Decal( DecalName, tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal )
+			util.Decal( DecalName, tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal )
+
+			-- Spawn a spike of blood
+			local Effect = EffectData()
+			Effect:SetOrigin( tr.HitPos )
+			util.Effect( EffectName, Effect )
+			
+			local Effect = EffectData()
+			Effect:SetOrigin( dmg:GetDamagePosition() )
+			util.Effect( EffectName, Effect )
 		end
 
 		-- Check if the player should be dead.
