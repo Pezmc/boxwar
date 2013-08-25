@@ -82,8 +82,42 @@ function meta:BoxwarKill()
 	
 	-- Safely remove the doll after 60 seconds
     SafeRemoveEntityDelayed(doll, 60)
+    
+    -- Human blood
+	DecalName = "Blood" --"Impact.Wood" --Impact.Wood, Blood
+	EffectName = "BloodImpact" --"BloodImpact"
 				  
     -- Delete the prop
 	self:RemoveProp()
+	
+	-- Perform a trace from the player down towards the ground
+	local Trace = {}
+	Trace.start = self:GetPos()
+	Trace.endpos = Trace.start - Vector(0,0,500);
+	Trace.filter = self.prop --self
+	local tr = util.TraceLine( Trace )
+			
+	-- If we hit something
+	if ( tr.Hit && tr.HitPos:Distance( self:GetPos() ) < 50 ) then
+	
+		-- Spawn some blood
+		util.Decal( DecalName, tr.HitPos + tr.HitNormal + Vector(0.1, 0.1, 0) * math.random(0,100),
+							   tr.HitPos - tr.HitNormal - Vector(0.1, 0.1, 0) * math.random(0,100))
+		util.Decal( DecalName, tr.HitPos - tr.HitNormal - Vector(0.1, 0.1, 0) * math.random(0,100),
+							   tr.HitPos + tr.HitNormal + Vector(0.1, 0.1, 0) * math.random(0,100))
+		util.Decal( DecalName, tr.HitPos - tr.HitNormal - Vector(0.1, 0.1, 0) * math.random(0,100),
+							   tr.HitPos - tr.HitNormal - Vector(0.1, 0.1, 0) * math.random(0,100))
+		util.Decal( DecalName, tr.HitPos + tr.HitNormal + Vector(0.1, 0.1, 0) * math.random(0,100),
+							   tr.HitPos + tr.HitNormal + Vector(0.1, 0.1, 0) * math.random(0,100))
+							   
+		-- Then show a blood "explosion"
+		local Effect = EffectData()
+		Effect:SetOrigin( tr.HitPos )
+		util.Effect( EffectName, Effect )
+		Effect = EffectData()
+		Effect:SetOrigin( self:GetPos() )
+		util.Effect( EffectName, Effect )			
+		
+	end
 end
 
