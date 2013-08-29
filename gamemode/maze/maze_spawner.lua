@@ -55,6 +55,14 @@ local crateSkins = {
 	1 --stencil
 }
 
+
+-- TEMP:
+local crate = "models/boxwar/testcube.mdl"
+local crateSkins = {
+	1
+}
+
+
 -- Spawn a stack of boxes
 function SpawnBoxWall(xPos, yPos, zMin, zMax, boxSize) 
 
@@ -103,6 +111,14 @@ local doubleCrateSkins = {
 	2 --dark
 }
 
+
+-- TEMP:
+local doubleCrate = "models/boxwar/testcube2.mdl"
+local doubleCrateSkins = {
+	1
+}
+
+
 -- Spawn a stack of double width boxes
 function SpawnDoubleWidthWall(boxType, xPos, yPos, zMin, zMax, boxWidth)
 
@@ -132,6 +148,7 @@ function SpawnDoubleWidthWall(boxType, xPos, yPos, zMin, zMax, boxWidth)
 		xDPos = xPos - boxWidth/2
 		xSPos = xPos - boxWidth
 	end
+	
 	
 	-- Spawn the first layer
 	local zPos = zMin + boxWidth;
@@ -356,4 +373,5 @@ function SpawnBox(position, model, skins, angle)
 	-- Disable physics on the box after spawn
 	local physObj = prop:GetPhysicsObject()
 	if physObj:IsValid( ) then physObj:EnableMotion( false ) end
+	
 end

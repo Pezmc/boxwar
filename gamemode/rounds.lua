@@ -200,7 +200,7 @@ function TellPlayersAboutWin(wintype, winner)
 					mostFrags = player
 				end
 			else
-				if mostFrags ~= nil then
+				if mostFrags == nil then
 					mostFrags = player
 				end
 			end

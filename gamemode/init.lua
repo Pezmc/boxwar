@@ -27,9 +27,15 @@ include("spawns.lua") -- spawn point for users
 include("lib/json.lua") -- parse json
 include("lib/toolkit.lua") -- add lua functions
 
--- Download hud resources
+-- Download hud resources (to be moved into the folders below)
 AddResourcesByDirectory("materials/boxwar_hud")
 AddResourcesByDirectory("effects/boxwar_hud")
+
+-- Download custom resources
+AddResourcesByDirectory("materials/boxwar")
+AddResourcesByDirectory("materials/models/boxwar")
+AddResourcesByDirectory("models/boxwar")
+
 
 -- Con var's
 CreateConVar("bw_roundtime_minutes", 10, FCVAR_NOTIFY, "The length of a round in minutes")

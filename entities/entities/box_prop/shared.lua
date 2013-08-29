@@ -35,8 +35,8 @@ function ENT:CalculateBoxPosition()
 		--self:SetAngles(Angle(-playerAngles.p, -playerAngles.y, -playerAngles.r))
 		--print(self:GetAngles())
 			
-		--[[ If the player is holding down attack 2 don't rotate
-		--if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
+		-- If the player is holding down attack 2 don't rotate
+		--[[if(pl:KeyDown(IN_ATTACK2) && pl:GetVelocity():Length() == 0) then
 			self:SetLocalAngles(Angle(0, self.lastYaw, 0)) --only the yaw (rotation in z)
 		else
 			local angles = pl:GetAngles()

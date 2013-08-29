@@ -3,35 +3,39 @@ function DrawAvatar()
 end
 hook.Add("Initialize", "Avatardeestim", DrawAvatar)
 
+-- Textures - relative to the folder "materials"
+-- local HUD_Texture = surface.GetTextureID("boxwar_hud/stats_hud")
+local HUD_Texture = Material("boxwar_hud/stats_hud.png", "nocull")
+
+-- local HUD_Texture_TOP = surface.GetTextureID("boxwar_hud/stats_hud_top")
+local HUD_Texture_TOP = Material("boxwar_hud/stats_hud_top.png", "nocull")
+
+local HUD_Texture_Icon = Material("boxwar_hud/stats_hud_icon.png", "nocull")
+-- local HUD_Texture_Icon = surface.GetTextureID("boxwar_hud/stats_hud_icon")
+-- local HUD_Texture_Ammo = surface.GetTextureID("boxwar_hud/ammo_hud_top")
+local HUD_Texture_Ammo = Material("boxwar_hud/ammo_hud_top.png", "nocull")
+
+-- Create fonts
+fontData = {
+	font = "arial",
+	size = 14,
+	weight = 400,
+	antialias = true,
+	additive = true
+}
+
+surface.CreateFont("status_hud_font", fontData)
+
+
 function HUD()
 	local User = LocalPlayer()
 	if !User:Alive() then return end
-	if(User:GetActiveWeapon() == NULL or User:GetActiveWeapon() == "Camara") then return end
-	
-	-- Textures - relative to the folder "materials"
-	-- local HUD_Texture = surface.GetTextureID("boxwar_hud/stats_hud")
-	local HUD_Texture = Material("boxwar_hud/stats_hud.png", "nocull")
-	
-	-- local HUD_Texture_TOP = surface.GetTextureID("boxwar_hud/stats_hud_top")
-	local HUD_Texture_TOP = Material("boxwar_hud/stats_hud_top.png", "nocull")
-	
-	local HUD_Texture_Icon = Material("boxwar_hud/stats_hud_icon.png", "nocull")
-	-- local HUD_Texture_Icon = surface.GetTextureID("boxwar_hud/stats_hud_icon")
-
-	-- local HUD_Texture_Ammo = surface.GetTextureID("boxwar_hud/ammo_hud_top")
-	local HUD_Texture_Ammo = Material("boxwar_hud/ammo_hud_top.png", "nocull")
-
-	-- local HUD_Texture_Hora = surface.GetTextureID("boxwar_hud/hud_clock")
+	if(User:GetActiveWeapon() == NILL) then return end
 	
 	local StatsHUDwidth 	= 200
 	local StatsHUDheight 	= 100
 	local StatsHUDposH	= ScrH() - 120
 	local StatsHUDposW	= 20
-	
-	local clockHUDwidth 	= 80
-	local clockHUDheight 	= 80
-	local clockHUDposH	= ScrH() - 63
-	local clockHUDposW	= 80
 	
 	local AmmoHUDwidth 	= 200
 	local AmmoHUDheight 	= 100
@@ -62,23 +66,6 @@ function HUD()
 	surface.SetMaterial( HUD_Texture_Icon )
 	surface.DrawTexturedRect( StatsHUDposW, StatsHUDposH, StatsHUDwidth, StatsHUDheight )
 	
-	--surface.SetDrawColor( 255, 255, 255, 255 )
-	--surface.SetTexture( HUD_Texture_Hora )
-	--surface.DrawTexturedRect( clockHUDposW, clockHUDposH, clockHUDwidth, clockHUDheight )
-	
-	-- Create fonts
-	fontData = {
-		font = "arial",
-		size = 14,
-		weight = 400,
-		antialias = true,
-		additive = true
-	}
-	
-	surface.CreateFont( "status_hud_font", fontData)
-	--fontData.size = 11
-	--surface.CreateFont( "adrys_HUD_Font2", fontData )
-	
 	-- Draw the font on the scren
 	draw.SimpleText(CurrentHP.."%" , "status_hud_font", 
 					StatsHUDposW + 124, StatsHUDposH + 39,
@@ -99,6 +86,7 @@ function HUD()
 		Avatar:SetPlayer( LocalPlayer(), 43)	
 		AvatarShouldDraw = 0
 	end
+
 end
 hook.Add( "HUDPaint", "HUD", HUD )
 

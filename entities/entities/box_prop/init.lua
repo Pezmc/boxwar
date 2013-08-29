@@ -5,12 +5,6 @@ AddCSLuaFile("shared.lua")
 -- Load shared
 include("shared.lua")
 
--- Force download (downloads related files automatically!)
-resource.AddFile("materials/models/boxwar/boxwar_crate01.vmt")
-resource.AddFile("materials/models/boxwar/boxwar_crate02.vmt")
-
-resource.AddFile("models/boxwar/boxwar_crate.mdl")
-
 -- Called when the entity loads
 function ENT:Initialize()
 
