@@ -18,9 +18,6 @@ AddCSLuaFile("sh_player.lua")
 include("lib/json.lua") -- parse json
 include("lib/toolkit.lua") -- add lua functions
 
--- 'Global' variables
-DEBUG_MODE = true
-
 -- Run the shared file
 include("sh_init.lua")
 
@@ -41,7 +38,7 @@ AddResourcesByDirectory("models/boxwar")
 
 
 -- Con var's
-CreateConVar("bw_roundtime_minutes", 10, FCVAR_NOTIFY, "The length of a round in minutes")
+CreateConVar("bw_roundtime_minutes", 1, FCVAR_NOTIFY, "The length of a round in minutes")
 CreateConVar("bw_max_frags", 10, FCVAR_NOTIFY, "The frag limit before a player wins a round")
 CreateConVar("bw_minimum_players", 2, FCVAR_NOTIFY, "Minimum amount of players required")
 CreateConVar("bw_debug_mode", 0, FCVAR_NOTIFY, "Output debug information true/false")
