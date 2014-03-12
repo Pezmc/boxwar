@@ -35,6 +35,7 @@ function vardump(value, depth, key)
   end
 end
 
+DEBUG_MODE = false
 function printDebug(message)
 	if(DEBUG_MODE) then
 		print("DEBUG: " .. message)

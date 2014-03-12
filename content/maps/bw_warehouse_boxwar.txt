@@ -1,0 +1,12 @@
+{
+    "mazes": {
+                 "groundFloor": {
+                                    "xBegin": -1000,
+                                      "xEnd": 1000,
+                                    "yBegin": -1000,
+                                      "yEnd": 1260,
+                                    "zBegin": -255,
+                                      "zEnd": 0
+                                }
+             }
+}
