@@ -9,7 +9,7 @@ include("shared.lua")
 	end
 end]]
 
-function ENT:Draw()
+--[[function ENT:Draw()
 	local pl = self:GetOwner()
 	
 	if pl:IsValid() then
@@ -20,4 +20,4 @@ function ENT:Draw()
 	end
 	
 	self:DrawModel()
-end
+end]]

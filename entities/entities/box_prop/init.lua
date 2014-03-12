@@ -9,7 +9,7 @@ include("shared.lua")
 function ENT:Initialize()
 
 	-- Set up entity defaults
-	self:SetModel("models/props_junk/wood_crate001a.mdl")
+	self:SetModel("models/boxwar/bwcrate1.mdl")
 	
 	-- Physics and bounding
 	self:SetSolid(SOLID_BBOX)
@@ -50,12 +50,14 @@ function ENT:OnTakeDamage(dmg)
 		self.health = self.health - dmg:GetDamage()
 		pl:SetHealth(self.health)
 		
+		--[[ Not implemented until new models have damaged versions
 		-- Damage the box
 		if(self.health < self.max_health * 0.25) then
 			self:SetModel("models/props_junk/wood_crate001a_damagedmax.mdl")
 		elseif(self.health < self.max_health * 0.5) then
 			self:SetModel("models/props_junk/wood_crate001a_damaged.mdl")
 		end
+		]]
 
 		-- Human blood
 		DecalName = "Blood" --"Impact.Wood" --Impact.Wood, Blood
@@ -67,8 +69,6 @@ function ENT:OnTakeDamage(dmg)
 		Trace.endpos = Trace.start + dmg:GetDamageForce( ) * 5
 		Trace.filter = pl
 		local tr = util.TraceLine( Trace )
-		
-		print(tr.Entity)
 				
 		-- If we hit something
 		if ( tr.Hit && tr.HitPos:Distance( pl:GetPos() ) < 100 ) then

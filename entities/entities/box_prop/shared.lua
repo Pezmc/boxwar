@@ -10,7 +10,7 @@ function ENT:CalculateMinMax()
 end
 
 function ENT:Initialize()
-	self:CalculateMinMax()
+	--self:CalculateMinMax()
 	self.lastYaw = 0;
 end
 
@@ -21,7 +21,11 @@ function ENT:CalculateBoxPosition()
 
 		-- Shift the box up by it's min Z position
 		local playerPos = self:GetOwner():GetPos()
-		self:SetPos(Vector(0,0,-min.z))
+		--[[print("--")
+		print(self:GetOwner():GetPos())
+		print(self:GetPos())
+		print(self:GetOwner():GetPos() - self:GetPos())]]
+		--self:SetPos(Vector(0,0,-min.z))
 		--print("Player then owner:")
 		--print(self:GetOwner():GetPos())
 		--print(self:GetPos())
