@@ -14,8 +14,12 @@ AddCSLuaFile("players/class_box.lua")
 AddCSLuaFile("cl_hud.lua")
 AddCSLuaFile("sh_player.lua")
 
+-- Useful LUA files
+include("lib/json.lua") -- parse json
+include("lib/toolkit.lua") -- add lua functions
+
 -- 'Global' variables
-DEBUG_MODE = false
+DEBUG_MODE = true
 
 -- Run the shared file
 include("sh_init.lua")
@@ -24,8 +28,7 @@ include("sh_init.lua")
 include("maze/maze.lua") -- generate mazes
 include("rounds.lua") -- handle game rounds
 include("spawns.lua") -- spawn point for users
-include("lib/json.lua") -- parse json
-include("lib/toolkit.lua") -- add lua functions
+
 
 -- Download hud resources (to be moved into the folders below)
 AddResourcesByDirectory("materials/boxwar_hud")
@@ -114,7 +117,7 @@ function GM:PlayerSpawn( pl )
 	player_manager.SetPlayerClass( pl, "player_crate" )
 	
 	pl:PrintMessage( HUD_PRINTTALK, "BoxWar is currently under development, please excuse any bugs." )
-	
+
 	-- Base gamemode
 	self.BaseClass:PlayerSpawn(pl)
 end
