@@ -55,14 +55,6 @@ local crateSkins = {
 	1 --stencil
 }
 
-
--- TEMP:
-local crate = "models/boxwar/testcube.mdl"
-local crateSkins = {
-	1
-}
-
-
 -- Spawn a stack of boxes
 function SpawnBoxWall(xPos, yPos, zMin, zMax, boxSize) 
 
@@ -111,14 +103,6 @@ local doubleCrateSkins = {
 	2 --dark
 }
 
-
--- TEMP:
-local doubleCrate = "models/boxwar/testcube2.mdl"
-local doubleCrateSkins = {
-	1
-}
-
-
 -- Spawn a stack of double width boxes
 function SpawnDoubleWidthWall(boxType, xPos, yPos, zMin, zMax, boxWidth)
 
@@ -155,7 +139,7 @@ function SpawnDoubleWidthWall(boxType, xPos, yPos, zMin, zMax, boxWidth)
 	SpawnBox(Vector(xDPos, yDPos, zPos ), doubleCrate, doubleCrateSkins, angle)
 	
 	-- Loop variables
-	local chance = 5; -- 7/10 chance to spawn box
+	local chance = 5; -- /10 chance to spawn box
 	local stopSpawn = false
 	
 	-- Create layers until we hit the roof
