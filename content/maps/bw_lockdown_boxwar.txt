@@ -1,0 +1,10 @@
+{
+    "mazes": [ {
+                 "xBegin": -470,
+                   "xEnd": 980,
+                 "yBegin": -980,
+                   "yEnd": 470,
+                 "zBegin": 0,
+                   "zEnd": 180
+             }]
+}
